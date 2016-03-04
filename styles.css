@@ -1,0 +1,14 @@
+body {
+  padding-top: 50px;
+}
+
+/*No need of responsiveness*/
+body,
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+  min-width: 970px;
+}
+.container {
+  width: 970px;
+  max-width: none !important;
+}
