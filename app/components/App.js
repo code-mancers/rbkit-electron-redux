@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactDom from 'react-dom'
 import Layout from './Layout'
 import configureStore from '../redux/store'
 import { Provider } from 'react-redux'
