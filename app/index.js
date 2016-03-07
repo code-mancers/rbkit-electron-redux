@@ -1,2 +1,2 @@
 require("babel-register");
-require('./app/components/layout.js');
+require('./app/components/App.js');

@@ -1,22 +1,20 @@
 import React from 'react'
 import ReactDom from 'react-dom'
-import Navbar from '../components/navbar'
-import Row from '../components/row'
-import Button from '../components/common/button'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import Navbar from '../components/Navbar'
+import Row from '../components/Row'
+import Button from '../components/common/Button'
 import ZMQ from 'zmq'
 import MsgPack from 'msgpack'
+import Actions from '../redux/actions'
 
 class Layout extends React.Component {
 
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-    };
-  }
-
   connectToServer() {
     console.log('Connecting to Server...');
-    // connection logic goes here
+    console.log(this.props)
+    this.props.dispatch(Actions.connectToServer());
   }
 
   componentDidMount() {
@@ -68,16 +66,14 @@ class Layout extends React.Component {
           </div>
         </div>
 
-        <Button onClick={this.connectToServer} value='Connect To Server' />
+        <Button onClick={this.connectToServer.bind(this)} dispatch={this.props.dispatch} value={this.props.connectionStatus} actions={this.props.actions}/>
       </div>
     )
   }
 }
 
-Layout.propTypes = {
-  // Validation logic
-};
-
-window.onload = function(){
-  ReactDOM.render(<Layout/>, document.getElementById('layout-container'));
+function mapStateToProps(state) {
+  return state
 }
+
+export default connect(mapStateToProps)(Layout)
