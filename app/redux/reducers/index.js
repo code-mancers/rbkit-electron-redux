@@ -2,7 +2,7 @@
 import connectionReducer from './connectionReducer'
 
 const rootReducer = combineReducers({
-  connection: connectionReducer
+  connectionStatus: connectionReducer
 })
 
 export default rootReducer

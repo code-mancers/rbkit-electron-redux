@@ -1,13 +1,10 @@
-let connectionReducer = function(todos = [], action) {
-  switch (action.type) {
-    case 'CONNECT':
-      return [{
-          text: action.text,
-          completed: false,
-          id: getId(todos)
-        }, ...todos]
-    default: 
-      return todos;
+let connectionReducer = function(connectionStatus='Connect To Server', action) {
+  switch(action.type) {
+    case 'CONNECT_TO_SERVER':
+      return Object.assign({}, { connectionStatus: 'Connected'})
+
+    default:
+      return connectionStatus;
   }
 }
 

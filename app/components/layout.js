@@ -1,19 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import Navbar from '../components/Navbar'
+import Navbar from '../components/common/Navbar'
 import Row from '../components/Row'
 import Button from '../components/common/Button'
 import ZMQ from 'zmq'
 import MsgPack from 'msgpack'
-import Actions from '../redux/actions'
+import actions from '../redux/actions'
+import Table from './Table'
 
 class Layout extends React.Component {
 
   connectToServer() {
     console.log('Connecting to Server...');
-    console.log(this.props)
-    this.props.dispatch(Actions.connectToServer());
+    this.props.actions.connectToServer();
   }
 
   componentDidMount() {
@@ -52,6 +52,7 @@ class Layout extends React.Component {
 
     console.log("Sending 'stop_cpu_profiling'");
     requester.send("stop_cpu_profiling");
+
   }
 
   render() {
@@ -65,9 +66,17 @@ class Layout extends React.Component {
           </div>
         </div>
 
-        <Button onClick={this.connectToServer.bind(this)} dispatch={this.props.dispatch} value={this.props.connectionStatus} actions={this.props.actions}/>
+        <Button onClick={this.connectToServer.bind(this)} value={this.props.connectionStatus} />
+
+        <Table />
       </div>
     )
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(actions, dispatch)
   }
 }
 
@@ -75,4 +84,4 @@ function mapStateToProps(state) {
   return state
 }
 
-export default connect(mapStateToProps)(Layout)
+export default connect(mapStateToProps, mapDispatchToProps)(Layout)
