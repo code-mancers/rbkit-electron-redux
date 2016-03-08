@@ -1,5 +1,5 @@
-let actions = {
-  connectToServer: function() {
+const actions = {
+  connectToServer() {
     return {
       type: 'CONNECT_TO_SERVER'
     }

@@ -1,13 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import Navbar from '../components/common/Navbar'
-import Row from '../components/Row'
-import Button from '../components/common/Button'
+import Navbar from '../components/common/navbar'
+import Row from '../components/row'
+import Button from '../components/common/button'
 import ZMQ from 'zmq'
 import MsgPack from 'msgpack'
 import actions from '../redux/actions'
-import Table from './Table'
+import Table from './table'
 
 class Layout extends React.Component {
 
@@ -18,7 +18,9 @@ class Layout extends React.Component {
 
   componentDidMount() {
 
-    var rawProfilingData = [];
+    // connect();
+
+    const rawProfilingData = [];
 
     const requester = ZMQ.socket('req');
     const subscriber = ZMQ.socket('sub');
