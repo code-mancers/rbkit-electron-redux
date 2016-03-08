@@ -23,6 +23,24 @@ class Layout extends React.Component {
     const requester = ZMQ.socket('req');
     const subscriber = ZMQ.socket('sub');
 
+    requester.monitor();
+
+    requester.on('connect', (e) => {
+      console.log('requestor connected', e);
+    });
+
+    subscriber.on('connect', (e) => {
+      console.log('subscriber connected', e);
+    });
+
+    requester.on('disconnect', (e) => {
+      console.log('requestor disconnected', e);
+    });
+
+    subscriber.on('disconnect', (e) => {
+      console.log('subscriber disconnected', e);
+    });
+
     requester.connect("tcp://localhost:5556");    
     subscriber.connect("tcp://localhost:5555"); 
     subscriber.subscribe("");  
@@ -32,6 +50,7 @@ class Layout extends React.Component {
       console.log("Received reply", ": [", decodedReply, ']');
     });
 
+
     subscriber.on("message", function(stream) {
       const decodedStream = MsgPack.unpack(stream);
       console.log("Received reply", ": [", decodedStream, ']');
@@ -39,6 +58,7 @@ class Layout extends React.Component {
     });
 
     process.on('SIGINT', function() {
+      requester.unmonitor();
       requester.close();
     });
 
