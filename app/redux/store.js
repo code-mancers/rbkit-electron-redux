@@ -1,12 +1,14 @@
-import { applyMiddleware, compose, createStore } from 'redux'
+import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import logger from 'redux-logger'
-import reducer from './reducer'
+import thunk from 'redux-thunk'
+import * as reducers from './reducer'
 
-let finalCreateStore = compose(
-  applyMiddleware(logger())
-)(createStore)
+let createStoreWithMiddleware;
 
+createStoreWithMiddleware = applyMiddleware(logger(), thunk)(createStore)
 
-export default function configureStore(initialState = { connectionStatus: '' }) {
-  return finalCreateStore(reducer, initialState)
+const rootReducer = combineReducers(reducers);
+
+export default function configureStore(initialState) {
+  return createStoreWithMiddleware(rootReducer, initialState)
 }

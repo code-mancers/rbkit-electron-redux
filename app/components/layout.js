@@ -3,19 +3,15 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import Navbar from '../components/common/Navbar'
 import Row from './row'
-import actions from '../redux/actions'
+import connectToServer from '../redux/actions'
 import Table from './Table'
 import Connect from './connectionForm';
 
 class Layout extends React.Component {
-
-  connectToServer() {
-    console.log('Connecting to Server...');
-    this.props.actions.connectToServer();
-  }
-
-  componentDidMount() {
-
+  connect(ip) {
+    console.log('Layout connect :: ', ip);
+    this.props.dispatch(connectToServer(ip));
+    // this.props.dispatch(actions.connectToServer(ip));
   }
 
   render() {
@@ -28,21 +24,16 @@ class Layout extends React.Component {
             <p className="lead">Use this document as a way to quickly start any new project.</p>
           </div>
         </div>
-        <Connect />
+        <Connect {...this.props} connect={this.connect.bind(this)}/>
         <Table />
       </div>
     )
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    actions: bindActionCreators(actions, dispatch)
-  }
-}
-
 function mapStateToProps(state) {
-  return state
+  console.log('mapStateToProps : ', state);
+  return state.connection
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Layout)
+export default connect(mapStateToProps)(Layout)

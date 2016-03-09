@@ -1,9 +1,9 @@
 import {Component} from 'react';
 
-import {Rbkit} from './rbkit';
+// import {Rbkit} from './rbkit';
 import Button from './common/Button'
 
-class Connect extends Component {
+export default class Connect extends Component {
   constructor (props) {
     super(props);
     this.connectToServer = this.connectToServer.bind(this);
@@ -22,4 +22,4 @@ class Connect extends Component {
   }
 }
 
-export default Rbkit(Connect);
+// export default Rbkit(Connect);
