@@ -3,11 +3,7 @@ import Layout from './layout'
 import configureStore from '../redux/store'
 import { Provider } from 'react-redux'
 
-const initialState = {
-  connectionStatus: 'Connect To Server'
-};
-
-const store = configureStore(initialState);
+let store = configureStore();
 
 window.onload = function(){
   ReactDOM.render(
