@@ -9,7 +9,7 @@ const connection = function (state = initialState, action) {
     case 'CONNECTED':
       return Object.assign({}, state, { status: 'CONNECTED'});
     case 'DISCONNECTED':
-      return Object.assign({}, state, { status: 'DISCONNECT'});
+      return Object.assign({}, state, { status: 'DISCONNECTED'});
 
     default:
       return state;

@@ -1,7 +1,7 @@
 import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
 import logger from 'redux-logger'
 import thunk from 'redux-thunk'
-import * as reducers from './reducer'
+import * as reducers from './reducers/connection'
 
 let createStoreWithMiddleware;
 
