@@ -18,6 +18,11 @@ const connection = function (state = initialState, action) {
   }
 };
 
+const handshake = function (state = {}, action) {
+  return action.data || state;
+}
+
 export {
-  connection
+  connection,
+  handshake
 };

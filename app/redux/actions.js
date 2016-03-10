@@ -17,6 +17,12 @@ export function connectToServer (ip) {
       }
     });
   }
-}
+};
 
-export default connectToServer;
+export function handshake (handshakeData) {
+  console.log('in handshake : ', handshakeData);
+  return {
+    type: 'HANDSHAKE',
+    data: handshakeData
+  }
+}
