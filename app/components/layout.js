@@ -28,13 +28,20 @@ class Layout extends React.Component {
           </div>
         </div>
         <Table />
+        {
+          (() => {
+            if (process.env.NODE_ENV !== 'production') {
+              const DevTools = require('./devTools').default;
+              return <DevTools />;
+            }
+          })()
+        }
       </div>
     )
   }
 }
 
 function mapStateToProps(state) {
-  console.log('mapStateToProps : ', state);
   return state.connection
 }
 
