@@ -13,7 +13,7 @@ export default class Navbar extends Component {
           <div id="navbar">
             <ul className="nav navbar-nav navbar-right">
               {
-                (['CONNECTED', 'DISCONNECTED'].indexOf(this.props.status) >= 0) ? <Indicator {...this.props}/> : <ConnectionForm {...this.props} />
+                (['CONNECTED', 'DISCONNECTED'].indexOf(this.props.status) >= 0) ? Indicator(this.props) : <ConnectionForm {...this.props} />
               }
             </ul>
           </div>
