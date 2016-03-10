@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux'
 import Navbar from '../components/common/Navbar'
 import Row from './row'
 import {connectToServer, handshake} from '../redux/actions'
-import Table from './Table'
+import DisplayHandshake from './displayhandshake'
 import Toolbelt from './toolbelt'
 
 class Layout extends React.Component {
@@ -36,14 +36,18 @@ class Layout extends React.Component {
           </div>
         </div>
         <Toolbelt {...this.props} handshake={this.handshake}/>
-        <Table />
+        <DisplayHandshake data={this.props.handshake}/>
       </div>
     )
   }
 }
 
 function mapStateToProps(state) {
-  return state.connection
+  console.log('mapStateToProps : ', state);
+  return {
+    status: state.connection.status,
+    handshake: state.handshake
+  }
 }
 
 export default connect(mapStateToProps)(Layout)
