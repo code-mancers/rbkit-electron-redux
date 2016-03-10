@@ -13,18 +13,20 @@ const RbkitConnection = (() => {
     subscriber = ZMQ.socket('sub');
     ip = options.ip;
 
+    requester.monitor(500, 0);
+
     requester.connect(`tcp://${ip}:5556`);
     subscriber.connect(`tcp://${ip}:5555`);
-    subscriber.subscribe("");
+    // subscriber.subscribe("");
 
-    requester.monitor(500, 0);
+
 
     requester.on('connect', options.onConnect);
     requester.on('disconnect', options.onDisconnect);
 
     // subscriber.on('connect', onConnect);
     // subscriber.on('disconnect', onDisconnect);
-    subscriber.subscribe("");
+    // subscriber.subscribe("");
 
     subscriber.on("message", function (stream) {
       const decodedStream = MsgPack.unpack(stream);

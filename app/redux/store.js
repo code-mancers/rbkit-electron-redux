@@ -5,7 +5,9 @@ import * as reducers from './reducer'
 
 let createStoreWithMiddleware;
 
-createStoreWithMiddleware = applyMiddleware(logger(), thunk)(createStore)
+createStoreWithMiddleware = compose(
+  applyMiddleware(logger(), thunk)
+)(createStore)
 
 const rootReducer = combineReducers(reducers);
 
