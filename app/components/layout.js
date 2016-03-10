@@ -24,7 +24,9 @@ class Layout extends React.Component {
         <div className="container">
           <div className="starter-template">
             <h1>Bootstrap starter template</h1>
-            <p className="lead">Use this document as a way to quickly start any new project.</p>
+            <p className="lead">
+              Use this document as a way to quickly start any new project.
+            </p>
           </div>
         </div>
         <Table />
@@ -34,7 +36,6 @@ class Layout extends React.Component {
 }
 
 function mapStateToProps(state) {
-  console.log('mapStateToProps : ', state);
   return state.connection
 }
 
