@@ -1,15 +1,15 @@
 const initialState = {
-  connectionStatus: ''
+  status: ''
 }
 
 const connection = function (state = initialState, action) {
   switch (action.type) {
     case 'CONNECT_TO_SERVER':
-      return Object.assign({}, state, { connectionStatus: 'Connecting...'})
+      return Object.assign({}, state, { status: ''});
     case 'CONNECTED':
-      return Object.assign({}, state, { connectionStatus: 'Connected'})
+      return Object.assign({}, state, { status: 'CONNECTED'});
     case 'DISCONNECTED':
-      return Object.assign({}, state, { connectionStatus: 'Disconnected'})
+      return Object.assign({}, state, { status: 'DISCONNECT'});
 
     default:
       return state;
