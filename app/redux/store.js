@@ -3,6 +3,7 @@ import logger from 'redux-logger'
 import thunk from 'redux-thunk'
 import * as reducers from './reducers/connection'
 import ZMQ from 'zmq';
+import MsgPack from 'msgpack'
 
 const requester = ZMQ.socket('req');
 requester.monitor(500, 0);
@@ -24,8 +25,13 @@ const zmqMiddlewareCreator = (zmq, options = {}) => {
         next({type, ...rest});
       }
 
-      if (type === 'CONNECT') {
-        zmq.connect(`tcp://${sock.ip}:5556`);
+      switch (type) {
+        case 'CONNECT':
+          zmq.connect(`tcp://${sock.ip}:5556`);
+          break;
+        case 'COMMAND':
+          zmq.send(sock.cmd);
+          break
       }
 
       zmq.on('connect', () => {
@@ -38,6 +44,16 @@ const zmqMiddlewareCreator = (zmq, options = {}) => {
       zmq.on('disconnect', () => {
         dispatch({
           type: 'DISCONNECTED'
+        });
+      });
+
+      zmq.on('message', (reply) => {
+        const data = MsgPack.unpack(reply);
+        console.log("Received reply in middleware : ", data);
+        dispatch({
+          type: 'DATA',
+          cmd: sock.cmd,
+          data
         });
       });
     };

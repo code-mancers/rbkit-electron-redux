@@ -19,8 +19,13 @@ const connection = function (state = initialState, action) {
 };
 
 const handshake = function (state = {}, action) {
-  return action.data || state;
-}
+  switch (action.type) {
+    case 'DATA':
+      return action.data;
+    default:
+      return state;
+  }
+};
 
 export {
   connection,

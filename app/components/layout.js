@@ -10,8 +10,6 @@ import Toolbelt from './toolbelt'
 class Layout extends React.Component {
   constructor() {
     super(...arguments);
-    this.connect = this.connect.bind(this);
-    this.handshake = this.handshake.bind(this);
   }
 
   connect(ip) {
@@ -19,14 +17,14 @@ class Layout extends React.Component {
     this.props.dispatch(connectToServer(ip));
   }
 
-  handshake(handshakeData) {
-    this.props.dispatch(handshake(handshakeData));
+  handshake() {
+    this.props.dispatch(handshake());
   }
 
   render() {
     return(
       <div>
-        <Navbar {...this.props} connect={this.connect}/>
+        <Navbar {...this.props} connect={::this.connect}/>
         <div className="container">
           <div className="starter-template">
             <h1>Bootstrap starter template</h1>
@@ -35,7 +33,7 @@ class Layout extends React.Component {
             </p>
           </div>
         </div>
-        <Toolbelt {...this.props} handshake={this.handshake}/>
+        <Toolbelt {...this.props} handshake={::this.handshake}/>
         <DisplayHandshake data={this.props.handshake}/>
       </div>
     )
@@ -50,4 +48,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps)(Layout)
+export default connect(mapStateToProps)(Layout);
