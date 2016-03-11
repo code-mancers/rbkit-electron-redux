@@ -40,7 +40,7 @@ class Toolbelt extends Component {
 
   render () {
     return (
-      <div>
+      <div className='col-md-10 col-md-offset-1'>
         <Button value='Handshake' onClick={this.handleHandshake.bind(this)} />
       </div>
     )

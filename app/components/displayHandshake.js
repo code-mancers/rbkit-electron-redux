@@ -3,26 +3,40 @@ import {Component} from 'react';
 class DisplayHandshake extends Component {
 
   display() {
+
+     const params = [
+      'rbkit_server_version',
+      'rbkit_protocol_version',
+      'process_name',
+      'pwd',
+      'pid',
+      'object_trace_enabled',
+      'cpu_profiling_enabled',
+      'clock_type',
+      'cpu_profiling_mode'
+    ];
+
     if (Object.keys(this.props.data).length !== 0) {
       return (
         <table className="table table-bordered table-condensed">
-          <tr><td>Rbkit Server Version</td><td>{this.props.data[2]['rbkit_server_version']}</td></tr>
-          <tr><td>Rbkit Protocol Version</td><td>{this.props.data[2]['rbkit_protocol_version']}</td></tr>
-          <tr><td>Process Name</td><td>{this.props.data[2]['process_name']}</td></tr>
-          <tr><td>PWD</td><td>{this.props.data[2]['pwd']}</td></tr>
-          <tr><td>PID</td><td>{this.props.data[2]['pid']}</td></tr>
-          <tr><td>Object Trace Enabled</td><td>{this.props.data[2]['object_trace_enabled']}</td></tr>
-          <tr><td>CPU Profiling Enabled</td><td>{this.props.data[2]['cpu_profiling_enabled']}</td></tr>
-          <tr><td>Clock Type</td><td>{this.props.data[2]['clock_type']}</td></tr>
-          <tr><td>CPU Profiling Mode</td><td>{this.props.data[2]['cpu_profiling_mode']}</td></tr>
+          {
+            params.map(value => {
+              return (
+                <tr>
+                  <td>{value.replace(/_/g, ' ')}</td>
+                  <td>{this.props.data[2][value]}</td>
+                </tr>
+              )
+            })
+          }
         </table>
-      )      
-    }    
+      )
+    }
   }
 
   render () {
     return (
-      <div>
+      <div className='col-md-10 col-md-offset-1'>
         {this.display()}
       </div>
     )
