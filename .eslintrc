@@ -1,7 +1,42 @@
 {
+  "rules": {
+    "indent": [
+      2,
+      2
+    ],
+    "quotes": [
+      2,
+      "single"
+    ],
+    "linebreak-style": [
+      2,
+      "unix"
+    ],
+    "semi": [
+      2,
+      "always"
+    ],
+    "camelcase": [
+      2,
+      {"properties": "never"}
+    ],
+    "react/jsx-indent-props": [2, 2]
+  },
   "env": {
-    "browser": true,
+    "es6": true,
     "node": true,
-    "es6": true
-  }
+    "browser": true
+  },
+  "extends": ["xo", "xo-react"],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "jsx": true,
+      "experimentalObjectRestSpread": true,
+    },
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react"
+  ]
 }
