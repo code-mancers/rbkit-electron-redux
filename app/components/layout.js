@@ -1,27 +1,26 @@
 import React from 'react'
-import ReactDom from 'react-dom'
-import Navbar from '../components/navbar'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import Navbar from '../components/common/navbar'
 import Row from '../components/row'
 import Button from '../components/common/button'
 import ZMQ from 'zmq'
 import MsgPack from 'msgpack'
+import actions from '../redux/actions'
+import Table from './table'
 
 class Layout extends React.Component {
 
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-    };
-  }
-
   connectToServer() {
     console.log('Connecting to Server...');
-    // connection logic goes here
+    this.props.actions.connectToServer();
   }
 
   componentDidMount() {
 
-    var rawProfilingData = [];
+    // connect();
+
+    const rawProfilingData = [];
 
     const requester = ZMQ.socket('req');
     const subscriber = ZMQ.socket('sub');
@@ -55,6 +54,7 @@ class Layout extends React.Component {
 
     console.log("Sending 'stop_cpu_profiling'");
     requester.send("stop_cpu_profiling");
+
   }
 
   render() {
@@ -68,16 +68,22 @@ class Layout extends React.Component {
           </div>
         </div>
 
-        <Button onClick={this.connectToServer} value='Connect To Server' />
+        <Button onClick={this.connectToServer.bind(this)} value={this.props.connectionStatus} />
+
+        <Table />
       </div>
     )
   }
 }
 
-Layout.propTypes = {
-  // Validation logic
-};
-
-window.onload = function(){
-  ReactDOM.render(<Layout/>, document.getElementById('layout-container'));
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(actions, dispatch)
+  }
 }
+
+function mapStateToProps(state) {
+  return state
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Layout)
