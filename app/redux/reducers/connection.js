@@ -1,17 +1,17 @@
-import {CONNECT_TO_SERVER, CONNECTED, DISCONNECTED} from './../actions'
+import {CONNECT_TO_SERVER, CONNECTED, DISCONNECTED} from './../actions';
 
 const initialState = {
   status: ''
-}
+};
 
 const connection = function (state = initialState, action) {
   switch (action.type) {
     case CONNECT_TO_SERVER:
-      return Object.assign({}, state, { status: ''});
+      return Object.assign({}, state, {status: ''});
     case CONNECTED:
-      return Object.assign({}, state, { status: 'CONNECTED'});
+      return Object.assign({}, state, {status: 'CONNECTED'});
     case DISCONNECTED:
-      return Object.assign({}, state, { status: 'DISCONNECTED'});
+      return Object.assign({}, state, {status: 'DISCONNECTED'});
 
     default:
       return state;

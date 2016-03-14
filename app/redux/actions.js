@@ -2,10 +2,9 @@ export const CONNECTED = 'CONNECTED';
 export const CONNECT_TO_SERVER = 'CONNECT_TO_SERVER';
 export const DISCONNECTED = 'DISCONNECTED';
 export const CONNECT = 'CONNECT';
+export const COMMAND = 'COMMAND';
 
-import RbkitConnection from '../rbkitConnection';
-
-export function connectToServer (ip) {
+export function connectToServer(ip) {
   return {
     type: CONNECT,
     sock: {
@@ -14,9 +13,9 @@ export function connectToServer (ip) {
   };
 }
 
-export function handshake () {
+export function handshake() {
   return {
-    type: 'COMMAND',
+    type: COMMAND,
     sock: {
       cmd: 'handshake'
     }

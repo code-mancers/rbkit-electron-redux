@@ -1,21 +1,19 @@
-import { applyMiddleware, compose, createStore, combineReducers } from 'redux'
-import logger from 'redux-logger'
-import thunk from 'redux-thunk'
-import * as reducers from './reducers/connection'
+import {applyMiddleware, compose, createStore, combineReducers} from 'redux';
+import logger from 'redux-logger';
+import thunk from 'redux-thunk';
+import * as reducers from './reducers/connection';
 import ZMQ from 'zmq';
-import MsgPack from 'msgpack'
+import MsgPack from 'msgpack';
 
 const requester = ZMQ.socket('req');
 requester.monitor(500, 0);
 
-let createStoreWithMiddleware;
-
-const zmqMiddlewareCreator = (zmq, options = {}) => {
-  console.log("zmqMiddlewareCreator");
-  const {onConnect, onDisconnect} = options;
+const zmqMiddlewareCreator = zmq => {
   return ({dispatch}) => {
-    return (next) => action => {
-      if (!action.sock) return next(action);
+    return next => action => {
+      if (!action.sock) {
+        return next(action);
+      }
       console.log('zmqMiddleWare :: ', action);
 
       const {type, sock, ...rest} = action;
@@ -31,7 +29,9 @@ const zmqMiddlewareCreator = (zmq, options = {}) => {
           break;
         case 'COMMAND':
           zmq.send(sock.cmd);
-          break
+          break;
+        default:
+          break;
       }
 
       zmq.on('connect', () => {
@@ -47,25 +47,26 @@ const zmqMiddlewareCreator = (zmq, options = {}) => {
         });
       });
 
-      zmq.on('message', (reply) => {
+      zmq.on('message', reply => {
         const data = MsgPack.unpack(reply);
-        console.log("Received reply in middleware : ", data);
+        console.log('Received reply in middleware : ', data);
         dispatch({
           type: 'DATA',
           cmd: sock.cmd,
           data
         });
       });
+      return zmq;
     };
   };
 };
 
-createStoreWithMiddleware = compose(
+const createStoreWithMiddleware = compose(
   applyMiddleware(logger(), thunk, zmqMiddlewareCreator(requester))
-)(createStore)
+)(createStore);
 
 const rootReducer = combineReducers(reducers);
 
 export default function configureStore(initialState) {
-  return createStoreWithMiddleware(rootReducer, initialState)
+  return createStoreWithMiddleware(rootReducer, initialState);
 }

@@ -1,11 +1,11 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import Navbar from '../components/common/Navbar'
-import Row from './row'
-import {connectToServer, handshake} from '../redux/actions'
-import DisplayHandshake from './displayhandshake'
-import Toolbelt from './toolbelt'
+import React, {PropTypes} from 'react';
+import {connect} from 'react-redux';
+// import {bindActionCreators} from 'redux';
+import Navbar from '../components/common/Navbar';
+// import Row from './row';
+import {connectToServer, handshake} from '../redux/actions';
+import DisplayHandshake from './displayhandshake';
+import Toolbelt from './toolbelt';
 
 class Layout extends React.Component {
   constructor() {
@@ -22,7 +22,7 @@ class Layout extends React.Component {
   }
 
   render() {
-    return(
+    return (
       <div>
         <Navbar {...this.props} connect={::this.connect}/>
         <div className="container">
@@ -36,16 +36,21 @@ class Layout extends React.Component {
         <Toolbelt {...this.props} handshake={::this.handshake}/>
         <DisplayHandshake data={this.props.handshake}/>
       </div>
-    )
+    );
   }
 }
+
+Layout.propTypes = {
+  dispatch: PropTypes.func,
+  handshake: PropTypes.object
+};
 
 function mapStateToProps(state) {
   console.log('mapStateToProps : ', state);
   return {
     status: state.connection.status,
     handshake: state.handshake
-  }
+  };
 }
 
 export default connect(mapStateToProps)(Layout);
