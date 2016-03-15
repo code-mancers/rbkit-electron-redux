@@ -8,12 +8,12 @@ export default class Navbar extends Component {
       <nav className="navbar navbar-default navbar-fixed-top">
         <div className="container">
           <div className="navbar-header">
-            <a className="navbar-brand" href="#">Rbkit Client</a>
+            <a className="navbar-brand" href="#">Rbkit</a>
           </div>
           <div id="navbar">
             <ul className="nav navbar-nav navbar-right">
               {
-                (['CONNECTED', 'DISCONNECTED'].indexOf(this.props.status) >= 0) ? Indicator(this.props) : <ConnectionForm {...this.props} />
+                (this.props.status !== '') ? Indicator(this.props) : <ConnectionForm {...this.props} />
               }
             </ul>
           </div>

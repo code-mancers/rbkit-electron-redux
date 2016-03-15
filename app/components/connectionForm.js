@@ -1,6 +1,5 @@
 import {Component} from 'react';
 
-// import {Rbkit} from './rbkit';
 import Button from './common/Button'
 
 export default class Connect extends Component {
@@ -16,10 +15,8 @@ export default class Connect extends Component {
     return (
       <div>
         <input ref="ip" id="ip" name="ip" placeHolder="Ip" />
-        <Button onClick={this.connectToServer} value={this.props.connectionStatus || 'Connect'} />
+        <Button onClick={this.connectToServer} value='Connect' />
       </div>
     )
   }
 }
-
-// export default Rbkit(Connect);
