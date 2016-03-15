@@ -27,7 +27,19 @@ const handshake = function (state = {}, action) {
   }
 };
 
+const cpuProfile = (state = {status: 'STOPPED'}, action) => {
+  switch (action.type) {
+    case 'DATA':
+      return Object.assign({}, state, {status: 'RUNNING', data: action.data, from: action.from});
+    case DISCONNECTED:
+      return Object.assign({}, state, {status: 'STOPPED'});
+    default:
+      return state;
+  }
+};
+
 export {
   connection,
+  cpuProfile,
   handshake
 };

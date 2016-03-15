@@ -3,13 +3,15 @@ import {connect} from 'react-redux';
 // import {bindActionCreators} from 'redux';
 import Navbar from '../components/common/Navbar';
 // import Row from './row';
-import {connectToServer, handshake} from '../redux/actions';
+import {connectToServer, handshake, startCpuProfiling} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
 import Toolbelt from './toolbelt';
 
 class Layout extends React.Component {
   constructor() {
     super(...arguments);
+    this.cpuProfiling = this.cpuProfiling.bind(this);
+    this.handshake = this.handshake.bind(this);
   }
 
   connect(ip) {
@@ -19,6 +21,10 @@ class Layout extends React.Component {
 
   handshake() {
     this.props.dispatch(handshake());
+  }
+
+  cpuProfiling() {
+    this.props.dispatch(startCpuProfiling());
   }
 
   render() {
@@ -33,7 +39,7 @@ class Layout extends React.Component {
             </p>
           </div>
         </div>
-        <Toolbelt {...this.props} handshake={::this.handshake}/>
+        <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
         <DisplayHandshake data={this.props.handshake}/>
       </div>
     );
@@ -49,7 +55,8 @@ function mapStateToProps(state) {
   console.log('mapStateToProps : ', state);
   return {
     status: state.connection.status,
-    handshake: state.handshake
+    handshake: state.handshake,
+    cpuProfile: state.cpuProfile
   };
 }
 

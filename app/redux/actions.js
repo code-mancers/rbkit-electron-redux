@@ -21,3 +21,21 @@ export function handshake() {
     }
   };
 }
+
+export function startCpuProfiling() {
+  return {
+    type: COMMAND,
+    sock: {
+      cmd: 'start_cpu_profiling'
+    }
+  };
+}
+
+export function stopCpuProfiling() {
+  return {
+    type: COMMAND,
+    sock: {
+      cmd: 'stop_cpu_profiling'
+    }
+  };
+}

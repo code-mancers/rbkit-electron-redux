@@ -6,14 +6,16 @@ import ZMQ from 'zmq';
 import MsgPack from 'msgpack';
 
 const requester = ZMQ.socket('req');
-requester.monitor(500, 0);
+const subscriber = ZMQ.socket('sub');
 
-const zmqMiddlewareCreator = zmq => {
+const zmqMiddlewareCreator = (zmq, subzmq) => {
   return ({dispatch}) => {
     return next => action => {
       if (!action.sock) {
         return next(action);
       }
+      zmq.monitor(500, 0);
+      subzmq.monitor(500, 0);
       console.log('zmqMiddleWare :: ', action);
 
       const {type, sock, ...rest} = action;
@@ -23,9 +25,14 @@ const zmqMiddlewareCreator = zmq => {
         next({type, ...rest});
       }
 
+      console.log('zmq :: ', zmq);
+
       switch (type) {
         case 'CONNECT':
-          zmq.connect(`tcp://${sock.ip}:5556`);
+          zmq.connect(`tcp://${sock.ip || 'localhost'}:5556`);
+          subzmq.connect(`tcp://${sock.ip || 'localhost'}:5555`);
+
+          subzmq.subscribe('');
           break;
         case 'COMMAND':
           zmq.send(sock.cmd);
@@ -34,35 +41,42 @@ const zmqMiddlewareCreator = zmq => {
           break;
       }
 
-      zmq.on('connect', () => {
-        console.log('zmqMiddleWare :: on connect');
+      const onConnect = evt => {
+        console.log('zmqMiddleWare :: on connect :: ', evt);
         dispatch({
           type: 'CONNECTED'
         });
-      });
+      };
 
-      zmq.on('disconnect', () => {
+      const onDisconnect = () => {
         dispatch({
           type: 'DISCONNECTED'
         });
-      });
+      };
 
-      zmq.on('message', reply => {
+      zmq.on('connect', onConnect);
+      subzmq.on('connect', onConnect);
+
+      zmq.on('disconnect', onDisconnect);
+      subzmq.on('disconnect', onDisconnect);
+
+      subzmq.on('message', reply => {
         const data = MsgPack.unpack(reply);
         console.log('Received reply in middleware : ', data);
         dispatch({
           type: 'DATA',
-          cmd: sock.cmd,
+          from: 'subscriber',
           data
         });
       });
-      return zmq;
+
+      // return next(type, ...rest);
     };
   };
 };
 
 const createStoreWithMiddleware = compose(
-  applyMiddleware(logger(), thunk, zmqMiddlewareCreator(requester))
+  applyMiddleware(logger(), thunk, zmqMiddlewareCreator(requester, subscriber))
 )(createStore);
 
 const rootReducer = combineReducers(reducers);
