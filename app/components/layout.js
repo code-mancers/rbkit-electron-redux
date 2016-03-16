@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
 import Navbar from '../components/common/Navbar';
-import {connectToServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
+import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
 import Toolbelt from './toolbelt';
 
@@ -10,11 +10,17 @@ class Layout extends React.Component {
     super(...arguments);
     this.cpuProfiling = this.cpuProfiling.bind(this);
     this.handshake = this.handshake.bind(this);
+    this.connect = this.connect.bind(this);
+    this.disconnect = this.disconnect.bind(this);
   }
 
   connect(ip) {
     console.log('Layout connect :: ', ip);
     this.props.dispatch(connectToServer(ip));
+  }
+
+  disconnect() {
+    this.props.dispatch(disconnectFromServer());
   }
 
   handshake() {
@@ -34,7 +40,7 @@ class Layout extends React.Component {
   render() {
     return (
       <div>
-        <Navbar {...this.props} connect={::this.connect}/>
+        <Navbar {...this.props} connect={this.connect} handleDisconnect={this.disconnect}/>
         <div className="container">
           <div className="starter-template">
             <h1>Bootstrap starter template</h1>

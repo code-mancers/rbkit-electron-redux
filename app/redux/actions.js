@@ -13,6 +13,12 @@ export function connectToServer(ip) {
   };
 }
 
+export function disconnectFromServer() {
+  return {
+    type: 'DISCONNECT'
+  };
+}
+
 export function handshake() {
   return {
     type: COMMAND,
