@@ -1,14 +1,15 @@
-import React from 'react'
-import Layout from './layout'
-import configureStore from '../redux/store'
-import { Provider } from 'react-redux'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Layout from './layout';
+import configureStore from '../redux/store';
+import {Provider} from 'react-redux';
 
-let store = configureStore();
+const store = configureStore();
 
-window.onload = function(){
+window.onload = function () {
   ReactDOM.render(
     <Provider store={store}>
-      <Layout />
+      <Layout/>
     </Provider>,
   document.getElementById('layout-container'));
-}
+};
