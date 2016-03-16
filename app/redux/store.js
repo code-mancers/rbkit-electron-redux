@@ -8,14 +8,16 @@ import MsgPack from 'msgpack';
 const requester = ZMQ.socket('req');
 const subscriber = ZMQ.socket('sub');
 
+requester.monitor(500, 0);
+subscriber.monitor(500, 0);
+
 const zmqMiddlewareCreator = (zmq, subzmq) => {
   return ({dispatch}) => {
     return next => action => {
       if (!action.sock) {
         return next(action);
       }
-      zmq.monitor(500, 0);
-      subzmq.monitor(500, 0);
+
       console.log('zmqMiddleWare :: ', action);
 
       const {type, sock, ...rest} = action;
@@ -32,10 +34,18 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
           zmq.connect(`tcp://${sock.ip || 'localhost'}:5556`);
           subzmq.connect(`tcp://${sock.ip || 'localhost'}:5555`);
 
-          subzmq.subscribe('');
           break;
         case 'COMMAND':
+          if (sock.cmd !== "handshake") {
+            subzmq.subscribe('');
+          }
           zmq.send(sock.cmd);
+          break;
+        case 'DISCONNECT':
+          subzmq.unsubscribe();
+
+          zmq.disconnect();
+          subzmq.disconnect();
           break;
         default:
           break;
@@ -59,6 +69,16 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
 
       zmq.on('disconnect', onDisconnect);
       subzmq.on('disconnect', onDisconnect);
+
+      zmq.on('message', reply => {
+        const data = MsgPack.unpack(reply);
+        console.log('Received reply in middleware : ', data);
+        dispatch({
+          type: 'DATA',
+          from: 'requester',
+          data
+        });
+      });
 
       subzmq.on('message', reply => {
         const data = MsgPack.unpack(reply);

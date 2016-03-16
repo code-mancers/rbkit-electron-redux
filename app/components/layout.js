@@ -1,9 +1,7 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
-// import {bindActionCreators} from 'redux';
 import Navbar from '../components/common/Navbar';
-// import Row from './row';
-import {connectToServer, handshake, startCpuProfiling} from '../redux/actions';
+import {connectToServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
 import Toolbelt from './toolbelt';
 
@@ -24,7 +22,13 @@ class Layout extends React.Component {
   }
 
   cpuProfiling() {
-    this.props.dispatch(startCpuProfiling());
+    let action;
+    if (this.props.cpuProfile.status === 'STOPPED') {
+      action = startCpuProfiling();
+    } else {
+      action = stopCpuProfiling();
+    }
+    this.props.dispatch(action);
   }
 
   render() {
@@ -48,6 +52,7 @@ class Layout extends React.Component {
 
 Layout.propTypes = {
   dispatch: PropTypes.func,
+  cpuProfile: PropTypes.object,
   handshake: PropTypes.object
 };
 
