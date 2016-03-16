@@ -27,12 +27,12 @@ const handshake = function (state = {}, action) {
   }
 };
 
-const cpuProfile = (state = {status: 'STOPPED'}, action) => {
+const cpuProfile = (state = {status: 'STOPPED', data: []}, action) => {
   switch (action.type) {
     case 'DATA':
-      return Object.assign({}, state, {status: 'RUNNING', data: action.data, from: action.from});
+      return Object.assign({}, state, {status: 'RUNNING', data: [...state.data, action.data], from: action.from});
     case DISCONNECTED:
-      return Object.assign({}, state, {status: 'STOPPED'});
+      return Object.assign({}, state, {status: 'STOPPED', data: []});
     default:
       return state;
   }
