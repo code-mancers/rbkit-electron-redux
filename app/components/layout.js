@@ -1,89 +1,53 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import Navbar from '../components/common/navbar'
-import Row from '../components/row'
-import Button from '../components/common/button'
-import ZMQ from 'zmq'
-import MsgPack from 'msgpack'
-import actions from '../redux/actions'
-import Table from './table'
+import Navbar from '../components/common/Navbar'
+import Row from './row'
+import {connectToServer, handshake} from '../redux/actions'
+import DisplayHandshake from './displayhandshake'
+import Toolbelt from './toolbelt'
 
 class Layout extends React.Component {
-
-  connectToServer() {
-    console.log('Connecting to Server...');
-    this.props.actions.connectToServer();
+  constructor() {
+    super(...arguments);
+    this.connect = this.connect.bind(this);
+    this.handshake = this.handshake.bind(this);
   }
 
-  componentDidMount() {
+  connect(ip) {
+    console.log('Layout connect :: ', ip);
+    this.props.dispatch(connectToServer(ip));
+  }
 
-    // connect();
-
-    const rawProfilingData = [];
-
-    const requester = ZMQ.socket('req');
-    const subscriber = ZMQ.socket('sub');
-
-    requester.connect("tcp://localhost:5556");    
-    subscriber.connect("tcp://localhost:5555"); 
-    subscriber.subscribe("");  
-
-    requester.on("message", function(reply) {
-      const decodedReply = MsgPack.unpack(reply);
-      console.log("Received reply", ": [", decodedReply, ']');
-    });
-
-    subscriber.on("message", function(stream) {
-      const decodedStream = MsgPack.unpack(stream);
-      console.log("Received reply", ": [", decodedStream, ']');
-      rawProfilingData.push(decodedStream);
-    });
-
-    process.on('SIGINT', function() {
-      requester.close();
-    });
-
-    console.log("Sending 'start_cpu_profiling'");
-    requester.send("start_cpu_profiling");
-
-    for(var i=0; i<5000; i++){
-      console.log('');
-      // loop to give the system time to profile
-    }
-
-    console.log("Sending 'stop_cpu_profiling'");
-    requester.send("stop_cpu_profiling");
-
+  handshake(handshakeData) {
+    this.props.dispatch(handshake(handshakeData));
   }
 
   render() {
     return(
       <div>
-        <Navbar/>
+        <Navbar {...this.props} connect={this.connect}/>
         <div className="container">
           <div className="starter-template">
             <h1>Bootstrap starter template</h1>
-            <p className="lead">Use this document as a way to quickly start any new project.</p>
+            <p className="lead">
+              Use this document as a way to quickly start any new project.
+            </p>
           </div>
         </div>
-
-        <Button onClick={this.connectToServer.bind(this)} value={this.props.connectionStatus} />
-
-        <Table />
+        <Toolbelt {...this.props} handshake={this.handshake}/>
+        <DisplayHandshake data={this.props.handshake}/>
       </div>
     )
   }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapStateToProps(state) {
+  console.log('mapStateToProps : ', state);
   return {
-    actions: bindActionCreators(actions, dispatch)
+    status: state.connection.status,
+    handshake: state.handshake
   }
 }
 
-function mapStateToProps(state) {
-  return state
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Layout)
+export default connect(mapStateToProps)(Layout)
