@@ -20,7 +20,7 @@ export default class Connect extends Component {
   renderDisconnect() {
     return (
       <div>
-        <button type="button" className="btn btn-danger" onClick={this.props.handleDisconnect}>Disconnect</button>
+        <button type="button" data-ip={this.props.ip} className="btn btn-danger" onClick={this.props.handleDisconnect}>Disconnect</button>
       </div>
     );
   }
@@ -30,6 +30,7 @@ export default class Connect extends Component {
 }
 
 Connect.propTypes = {
+  ip: PropTypes.string,
   status: PropTypes.string,
   connect: PropTypes.func,
   handleDisconnect: PropTypes.func

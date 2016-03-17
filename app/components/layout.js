@@ -19,8 +19,8 @@ class Layout extends React.Component {
     this.props.dispatch(connectToServer(ip));
   }
 
-  disconnect() {
-    this.props.dispatch(disconnectFromServer());
+  disconnect(e) {
+    this.props.dispatch(disconnectFromServer(e.target.dataset.ip));
   }
 
   handshake() {
@@ -63,8 +63,8 @@ Layout.propTypes = {
 };
 
 function mapStateToProps(state) {
-  console.log('mapStateToProps : ', state);
   return {
+    ip: state.connection.ip,
     status: state.connection.status,
     handshake: state.handshake,
     cpuProfile: state.cpuProfile

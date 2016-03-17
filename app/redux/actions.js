@@ -13,9 +13,12 @@ export function connectToServer(ip) {
   };
 }
 
-export function disconnectFromServer() {
+export function disconnectFromServer(ip) {
   return {
-    type: 'DISCONNECT'
+    type: 'DISCONNECT',
+    sock: {
+      ip
+    }
   };
 }
 
