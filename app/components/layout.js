@@ -1,16 +1,16 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import Navbar from '../components/common/Navbar'
-import Row from './row'
-import {connectToServer, handshake} from '../redux/actions'
-import DisplayHandshake from './displayhandshake'
-import Toolbelt from './toolbelt'
+import React, {PropTypes} from 'react';
+import {connect} from 'react-redux';
+// import {bindActionCreators} from 'redux';
+import Navbar from '../components/common/Navbar';
+// import Row from './row';
+import {connectToServer, handshake, startCpuProfiling} from '../redux/actions';
+import DisplayHandshake from './displayhandshake';
+import Toolbelt from './toolbelt';
 
 class Layout extends React.Component {
   constructor() {
     super(...arguments);
-    this.connect = this.connect.bind(this);
+    this.cpuProfiling = this.cpuProfiling.bind(this);
     this.handshake = this.handshake.bind(this);
   }
 
@@ -19,14 +19,18 @@ class Layout extends React.Component {
     this.props.dispatch(connectToServer(ip));
   }
 
-  handshake(handshakeData) {
-    this.props.dispatch(handshake(handshakeData));
+  handshake() {
+    this.props.dispatch(handshake());
+  }
+
+  cpuProfiling() {
+    this.props.dispatch(startCpuProfiling());
   }
 
   render() {
-    return(
+    return (
       <div>
-        <Navbar {...this.props} connect={this.connect}/>
+        <Navbar {...this.props} connect={::this.connect}/>
         <div className="container">
           <div className="starter-template">
             <h1>Bootstrap starter template</h1>
@@ -35,19 +39,25 @@ class Layout extends React.Component {
             </p>
           </div>
         </div>
-        <Toolbelt {...this.props} handshake={this.handshake}/>
+        <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
         <DisplayHandshake data={this.props.handshake}/>
       </div>
-    )
+    );
   }
 }
+
+Layout.propTypes = {
+  dispatch: PropTypes.func,
+  handshake: PropTypes.object
+};
 
 function mapStateToProps(state) {
   console.log('mapStateToProps : ', state);
   return {
     status: state.connection.status,
-    handshake: state.handshake
-  }
+    handshake: state.handshake,
+    cpuProfile: state.cpuProfile
+  };
 }
 
-export default connect(mapStateToProps)(Layout)
+export default connect(mapStateToProps)(Layout);

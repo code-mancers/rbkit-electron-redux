@@ -1,50 +1,24 @@
-import {Component} from 'react';
-import Button from './common/Button'
-
-import ZMQ from 'zmq';
-import MsgPack from 'msgpack';
+import React, {Component, PropTypes} from 'react';
+import Button from './common/Button';
 
 class Toolbelt extends Component {
-
-  handleHandshake() {
-
-    let requester = ZMQ.socket('req');
-    let subscriber = ZMQ.socket('sub');
-    let ip = 'localhost';
-
-    requester.on("message", function(reply) {
-      const decodedReply = MsgPack.unpack(reply);
-      console.log("Received reply", ": [", decodedReply, ']');
-      this.displayHandshake(decodedReply);
-    }.bind(this));
-
-    requester.connect(`tcp://${ip}:5556`);
-    subscriber.connect(`tcp://${ip}:5555`);
-
-    subscriber.on("message", function (stream) {
-      const decodedStream = MsgPack.unpack(stream);
-      console.log("Subscriber Received reply", ": [", decodedStream, ']');
-    });
-
-    process.on('SIGINT', function() {
-      requester.close();
-    });
-
-    requester.send("handshake");
-
-  }
-
-  displayHandshake(status) {
-    this.props.handshake(status)
-  }
-
-  render () {
+  render() {
+    const btnText = this.props.cpuProfile.status === 'STOPPED' ? "Start CPU Profiling" : "Stop CPU Profiling";
     return (
-      <div className='col-md-10 col-md-offset-1'>
-        <Button value='Handshake' onClick={this.handleHandshake.bind(this)} />
+      <div className="col-md-10 col-md-offset-1">
+        <Button value="Handshake" onClick={this.props.handshake}/>
+        <button className='btn btn-success' onClick={this.props.handleCpuSampling}>
+          {btnText}
+          {this.props.cpuProfile.status === 'RUNNING' ? <i className="fa fa-spinner fa-spin"></i> : null}
+        </button>
       </div>
-    )
+    );
   }
 }
+
+Toolbelt.propTypes = {
+  handshake: PropTypes.func,
+  handleCpuSampling: PropTypes.func
+};
 
 export default Toolbelt;

@@ -1,28 +1,41 @@
 export const CONNECTED = 'CONNECTED';
 export const CONNECT_TO_SERVER = 'CONNECT_TO_SERVER';
 export const DISCONNECTED = 'DISCONNECTED';
+export const CONNECT = 'CONNECT';
+export const COMMAND = 'COMMAND';
 
-import RbkitConnection from '../rbkitConnection';
-
-export function connectToServer (ip) {
-  return dispatch => {
-    RbkitConnection.connect({
-      ip: ip,
-      onConnect: () => {
-        console.log('onConnect');
-        dispatch({type: CONNECTED});
-      },
-      onDisconnect: () => {
-        dispatch({type: DISCONNECTED});
-      }
-    });
-  }
-};
-
-export function handshake (handshakeData) {
-  console.log('in handshake : ', handshakeData);
+export function connectToServer(ip) {
   return {
-    type: 'HANDSHAKE',
-    data: handshakeData
-  }
+    type: CONNECT,
+    sock: {
+      ip
+    }
+  };
+}
+
+export function handshake() {
+  return {
+    type: COMMAND,
+    sock: {
+      cmd: 'handshake'
+    }
+  };
+}
+
+export function startCpuProfiling() {
+  return {
+    type: COMMAND,
+    sock: {
+      cmd: 'start_cpu_profiling'
+    }
+  };
+}
+
+export function stopCpuProfiling() {
+  return {
+    type: COMMAND,
+    sock: {
+      cmd: 'stop_cpu_profiling'
+    }
+  };
 }
