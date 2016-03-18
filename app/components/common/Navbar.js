@@ -1,10 +1,9 @@
-import React, {Component} from 'react'
+import React, {Component} from 'react';
 import ConnectionForm from '../connectionForm';
-import Indicator from '../indicator';
 
 export default class Navbar extends Component {
   render() {
-    return(
+    return (
       <nav className="navbar navbar-default navbar-fixed-top">
         <div className="container">
           <div className="navbar-header">
@@ -12,13 +11,11 @@ export default class Navbar extends Component {
           </div>
           <div id="navbar">
             <ul className="nav navbar-nav navbar-right">
-              {
-                (this.props.status !== '') ? Indicator(this.props) : <ConnectionForm {...this.props} />
-              }
+              <ConnectionForm {...this.props}/>
             </ul>
           </div>
         </div>
       </nav>
-    )
+    );
   }
 }

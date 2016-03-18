@@ -1,9 +1,7 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
-// import {bindActionCreators} from 'redux';
 import Navbar from '../components/common/Navbar';
-// import Row from './row';
-import {connectToServer, handshake, startCpuProfiling} from '../redux/actions';
+import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
 import Toolbelt from './toolbelt';
 
@@ -12,6 +10,8 @@ class Layout extends React.Component {
     super(...arguments);
     this.cpuProfiling = this.cpuProfiling.bind(this);
     this.handshake = this.handshake.bind(this);
+    this.connect = this.connect.bind(this);
+    this.disconnect = this.disconnect.bind(this);
   }
 
   connect(ip) {
@@ -19,18 +19,28 @@ class Layout extends React.Component {
     this.props.dispatch(connectToServer(ip));
   }
 
+  disconnect() {
+    this.props.dispatch(disconnectFromServer());
+  }
+
   handshake() {
     this.props.dispatch(handshake());
   }
 
   cpuProfiling() {
-    this.props.dispatch(startCpuProfiling());
+    let action;
+    if (this.props.cpuProfile.status === 'STOPPED') {
+      action = startCpuProfiling();
+    } else {
+      action = stopCpuProfiling();
+    }
+    this.props.dispatch(action);
   }
 
   render() {
     return (
       <div>
-        <Navbar {...this.props} connect={::this.connect}/>
+        <Navbar {...this.props} connect={this.connect} handleDisconnect={this.disconnect}/>
         <div className="container">
           <div className="starter-template">
             <h1>Bootstrap starter template</h1>
@@ -48,6 +58,7 @@ class Layout extends React.Component {
 
 Layout.propTypes = {
   dispatch: PropTypes.func,
+  cpuProfile: PropTypes.object,
   handshake: PropTypes.object
 };
 
