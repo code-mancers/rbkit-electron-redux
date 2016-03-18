@@ -31,11 +31,19 @@ const handshake = function (state = {}, action) {
 
 const cpuProfile = (state = {status: 'STOPPED', data: []}, action) => {
   switch (action.type) {
-    case 'DATA':
+    case CONNECTED: {
+      return Object.assign({}, state, {data: []});
+    }
+    case 'DATA': {
       if (action.from !== 'subscriber') {
         return Object.assign({}, state, {status: 'STOPPED'});
       }
-      return Object.assign({}, state, {status: 'RUNNING', data: [...state.data, action.data], from: action.from});
+      let data = state.data.splice(0);
+      if (state.status === 'STOPPED') {
+        data = [];
+      }
+      return Object.assign({}, state, {status: 'RUNNING', data: [...data, action.data], from: action.from});
+    }
     case DISCONNECTED:
     case 'DISCONNECT':
       return Object.assign({}, state, {status: 'STOPPED', data: []});

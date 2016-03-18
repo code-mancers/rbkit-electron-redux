@@ -11,12 +11,16 @@ class Toolbelt extends Component {
       btnClass = 'btn-success';
     }
     return (
-      <div className="col-md-10 col-md-offset-1">
-        <Button value="Handshake" onClick={this.props.handshake}/>
-        <button className={`btn ${btnClass}`} data-status={cpuProfile.status} onClick={this.props.handleCpuSampling}>
-          {btnText}
-          {cpuProfile.status === 'RUNNING' ? <i className="fa fa-spinner fa-spin"></i> : null}
-        </button>
+      <div className="row">
+        <div className="col-md-2">
+          <Button value="Handshake" onClick={this.props.handshake}/>
+        </div>
+        <div className="col-md-3">
+          <button className={`btn ${btnClass}`} data-status={cpuProfile.status} onClick={this.props.handleCpuSampling}>
+            {btnText}
+            {cpuProfile.status === 'RUNNING' ? <i className="fa fa-spinner fa-spin"></i> : null}
+          </button>
+        </div>
       </div>
     );
   }

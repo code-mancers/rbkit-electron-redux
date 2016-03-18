@@ -12,3 +12,7 @@ body,
   width: 970px;
   max-width: none !important;
 }
+
+.tools-wrapper {
+  margin-top: 10px;
+}

@@ -42,15 +42,16 @@ class Layout extends React.Component {
       <div>
         <Navbar {...this.props} connect={this.connect} handleDisconnect={this.disconnect}/>
         <div className="container">
-          <div className="starter-template">
-            <h1>Bootstrap starter template</h1>
-            <p className="lead">
-              Use this document as a way to quickly start any new project.
-            </p>
+          <div className="row tools-wrapper">
+            <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
+            <div className="row">
+              <div className="col-md-12">Data Count : {this.props.cpuProfile.data.length} </div>
+            </div>
+            <div className="row">
+              <DisplayHandshake data={this.props.handshake}/>
+            </div>
           </div>
         </div>
-        <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
-        <DisplayHandshake data={this.props.handshake}/>
       </div>
     );
   }
