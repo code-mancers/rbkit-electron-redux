@@ -31,8 +31,8 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
 
       switch (type) {
         case 'CONNECT':
-          zmq.connect(`tcp://${sock.ip || 'localhost'}:5556`);
-          subzmq.connect(`tcp://${sock.ip || 'localhost'}:5555`);
+          zmq.connect('tcp://localhost:5556');
+          subzmq.connect('tcp://localhost:5555');
 
           break;
         case 'COMMAND':
@@ -48,26 +48,22 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
         case 'DISCONNECT':
           subzmq.unsubscribe('');
 
-          zmq.disconnect(`tcp://${sock.ip || 'localhost'}:5556`);
-          subzmq.disconnect(`tcp://${sock.ip || 'localhost'}:5555`);
+          zmq.disconnect('tcp://localhost:5556');
+          subzmq.disconnect('tcp://localhost:5555');
           break;
         default:
           break;
       }
 
-      const onConnect = (fd, endpoint) => {
-        const ip = endpoint.split(':')[1].substring(2);
+      const onConnect = () => {
         dispatch({
-          type: 'CONNECTED',
-          ip
+          type: 'CONNECTED'
         });
       };
 
-      const onDisconnect = (fd, endpoint) => {
-        const ip = endpoint.split(':')[1].substring(2);
+      const onDisconnect = () => {
         dispatch({
-          type: 'DISCONNECTED',
-          ip
+          type: 'DISCONNECTED'
         });
       };
 
