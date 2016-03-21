@@ -14,13 +14,12 @@ class Layout extends React.Component {
     this.disconnect = this.disconnect.bind(this);
   }
 
-  connect(ip) {
-    console.log('Layout connect :: ', ip);
-    this.props.dispatch(connectToServer(ip));
+  connect() {
+    this.props.dispatch(connectToServer());
   }
 
-  disconnect(e) {
-    this.props.dispatch(disconnectFromServer(e.target.dataset.ip));
+  disconnect() {
+    this.props.dispatch(disconnectFromServer());
   }
 
   handshake() {
@@ -40,7 +39,7 @@ class Layout extends React.Component {
   render() {
     return (
       <div>
-        <Navbar {...this.props} connect={this.connect} handleDisconnect={this.disconnect}/>
+        <Navbar {...this.props} handleConnect={this.connect} handleDisconnect={this.disconnect}/>
         <div className="container">
           <div className="row tools-wrapper">
             <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
