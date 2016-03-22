@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import Navbar from '../components/common/Navbar';
 import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
+import DisplayCPUProfile from './displayCPUProfile';
 import Toolbelt from './toolbelt';
 
 class Layout extends React.Component {
@@ -48,6 +49,7 @@ class Layout extends React.Component {
             </div>
             <div className="row">
               <DisplayHandshake data={this.props.handshake}/>
+              <DisplayCPUProfile data={this.props.cpuProfile}/>
             </div>
           </div>
         </div>
