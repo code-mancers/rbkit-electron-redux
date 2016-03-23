@@ -1,7 +1,11 @@
 import React, {PropTypes} from 'react';
 
 const ConnectButton = props => {
-  return <button type="button" className="btn btn-success" onClick={props.handleConnect}>Connect</button>;
+  return (
+    <button type="button" className="btn btn-success" onClick={props.handleConnect}>
+      { props.status === 'CONNECTING' ? 'Connecting...' : 'Connect' }
+    </button>
+  );
 };
 
 ConnectButton.propTypes = {

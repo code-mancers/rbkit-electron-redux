@@ -4,6 +4,7 @@ import Navbar from '../components/common/Navbar';
 import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
 import Toolbelt from './toolbelt';
+import Alert from './common/alert';
 
 class Layout extends React.Component {
   constructor() {
@@ -40,6 +41,9 @@ class Layout extends React.Component {
     return (
       <div>
         <Navbar {...this.props} handleConnect={this.connect} handleDisconnect={this.disconnect}/>
+        {
+          (this.props.status === 'FAILED') ? <Alert type="danger">{this.props.message}</Alert> : ''
+        }
         <div className="container">
           <div className="row tools-wrapper">
             <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
@@ -58,6 +62,8 @@ class Layout extends React.Component {
 
 Layout.propTypes = {
   dispatch: PropTypes.func,
+  message: PropTypes.string,
+  status: PropTypes.string,
   cpuProfile: PropTypes.object,
   handshake: PropTypes.object
 };
@@ -66,6 +72,7 @@ function mapStateToProps(state) {
   return {
     ip: state.connection.ip,
     status: state.connection.status,
+    message: state.connection.message,
     handshake: state.handshake,
     cpuProfile: state.cpuProfile
   };

@@ -5,6 +5,8 @@ import * as reducers from './reducers/connection';
 import ZMQ from 'zmq';
 import MsgPack from 'msgpack';
 
+let connectTimer;
+
 const requester = ZMQ.socket('req');
 const subscriber = ZMQ.socket('sub');
 
@@ -33,6 +35,17 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
         case 'CONNECT':
           zmq.connect('tcp://localhost:5556');
           subzmq.connect('tcp://localhost:5555');
+
+          dispatch({
+            type: 'CONNECTING'
+          });
+
+          connectTimer = setTimeout(() => {
+            dispatch({
+              type: 'ERROR',
+              message: 'Not able to connect to server'
+            });
+          }, 5000);
 
           break;
         case 'COMMAND':
@@ -76,6 +89,7 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
       zmq.on('message', reply => {
         const data = MsgPack.unpack(reply);
         console.log('Received reply in middleware : ', data);
+        clearTimeout(connectTimer);
         dispatch({
           type: 'DATA',
           from: 'requester',
