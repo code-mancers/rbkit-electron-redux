@@ -1,0 +1,6 @@
+export default {
+  zmq: {
+    requester: 'tcp://localhost:5556',
+    subscriber: 'tcp://localhost:5555'
+  }
+};

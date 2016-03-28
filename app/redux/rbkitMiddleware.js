@@ -1,4 +1,7 @@
 import MsgPack from 'msgpack';
+import config from '../../config/config';
+
+const zmqConfig = config.zmq;
 
 const rbkit = (reqzmq, subzmq) => {
   return ({dispatch}) => {
@@ -58,8 +61,8 @@ const rbkit = (reqzmq, subzmq) => {
 
       switch (type) {
         case 'CONNECT':
-          reqzmq.connect('tcp://localhost:5556');
-          subzmq.connect('tcp://localhost:5555');
+          reqzmq.connect(zmqConfig.requester);
+          subzmq.connect(zmqConfig.subscriber);
 
           break;
         case 'COMMAND':
@@ -75,8 +78,8 @@ const rbkit = (reqzmq, subzmq) => {
         case 'DISCONNECT':
           subzmq.unsubscribe('');
 
-          reqzmq.disconnect('tcp://localhost:5556');
-          subzmq.disconnect('tcp://localhost:5555');
+          reqzmq.disconnect(zmqConfig.requester);
+          subzmq.disconnect(zmqConfig.subscriber);
           break;
         default:
           break;
