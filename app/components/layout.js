@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
 import Navbar from '../components/common/Navbar';
-import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
+import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling, updateCPUProfilingTable} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
 import DisplayCPUProfile from './displayCPUProfile';
 import Toolbelt from './toolbelt';
@@ -13,7 +13,8 @@ class Layout extends React.Component {
     this.handshake = this.handshake.bind(this);
     this.connect = this.connect.bind(this);
     this.disconnect = this.disconnect.bind(this);
-    this.displayCPUProfilingdata = this.displayCPUProfilingdata.bind(this);
+    this.displayCPUProfilingTable = this.displayCPUProfilingTable.bind(this);
+    this.updateProfilingData = this.updateProfilingData.bind(this)
   }
 
   connect() {
@@ -28,6 +29,10 @@ class Layout extends React.Component {
     this.props.dispatch(handshake());
   }
 
+  updateProfilingData(data) {
+    this.props.dispatch(updateCPUProfilingTable(data));
+  }
+
   cpuProfiling() {
     let action;
     if (this.props.cpuProfile.status === 'STOPPED') {
@@ -38,9 +43,9 @@ class Layout extends React.Component {
     this.props.dispatch(action);
   }
 
-  displayCPUProfilingdata() {
+  displayCPUProfilingTable() {
     if (this.props.cpuProfile.data.length !== 0 && this.props.cpuProfile.status === 'STOPPED') {
-      return (<DisplayCPUProfile data={this.props.cpuProfile}/>)
+      return (<DisplayCPUProfile cpuProfilingTable={this.props.cpuProfilingTable} data={this.props.cpuProfile} updateProfilingData={this.updateProfilingData}/>)
     }
   }
 
@@ -55,7 +60,7 @@ class Layout extends React.Component {
               <div className="col-md-12">Data Count : {this.props.cpuProfile.data.length} </div>
             </div>
             <div className="row">
-              { this.displayCPUProfilingdata() }
+              { this.displayCPUProfilingTable() }
             </div>
           </div>
         </div>
@@ -75,7 +80,8 @@ function mapStateToProps(state) {
     ip: state.connection.ip,
     status: state.connection.status,
     handshake: state.handshake,
-    cpuProfile: state.cpuProfile
+    cpuProfile: state.cpuProfile,
+    cpuProfilingTable: state.cpuProfilingTable
   };
 }
 

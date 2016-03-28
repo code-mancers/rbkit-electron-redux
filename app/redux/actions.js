@@ -44,3 +44,10 @@ export function stopCpuProfiling() {
     }
   };
 }
+
+export function updateCPUProfilingTable(cpuProfilingTable) {
+  return {
+    type: 'UPDATE_CPU_PROFILING_TABLE',
+    data: cpuProfilingTable
+  };
+}
