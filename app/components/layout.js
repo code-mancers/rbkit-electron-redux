@@ -13,6 +13,7 @@ class Layout extends React.Component {
     this.handshake = this.handshake.bind(this);
     this.connect = this.connect.bind(this);
     this.disconnect = this.disconnect.bind(this);
+    this.displayCPUProfilingdata = this.displayCPUProfilingdata.bind(this);
   }
 
   connect() {
@@ -37,6 +38,12 @@ class Layout extends React.Component {
     this.props.dispatch(action);
   }
 
+  displayCPUProfilingdata() {
+    if (this.props.cpuProfile.data.length !== 0 && this.props.cpuProfile.status === 'STOPPED') {
+      return (<DisplayCPUProfile data={this.props.cpuProfile}/>)
+    }
+  }
+
   render() {
     return (
       <div>
@@ -48,8 +55,7 @@ class Layout extends React.Component {
               <div className="col-md-12">Data Count : {this.props.cpuProfile.data.length} </div>
             </div>
             <div className="row">
-              <DisplayHandshake data={this.props.handshake}/>
-              <DisplayCPUProfile data={this.props.cpuProfile}/>
+              { this.displayCPUProfilingdata() }
             </div>
           </div>
         </div>
