@@ -5,10 +5,10 @@ class Toolbelt extends Component {
   render() {
     const cpuProfile = this.props.cpuProfile;
     let btnText = 'Stop CPU Profiling';
-    let btnClass = 'btn-danger';
+    let btnClass = 'btn btn-danger';
     if (cpuProfile.status === 'STOPPED') {
       btnText = 'Start CPU Profiling';
-      btnClass = 'btn-success';
+      btnClass = 'btn btn-success';
     }
     return (
       <div className="row">
@@ -16,7 +16,7 @@ class Toolbelt extends Component {
           <Button value="Handshake" onClick={this.props.handshake}/>
         </div>
         <div className="col-md-3">
-          <button className={`btn ${btnClass}`} data-status={cpuProfile.status} onClick={this.props.handleCpuSampling}>
+          <button className={btnClass} data-status={cpuProfile.status} onClick={this.props.handleCpuSampling}>
             {btnText}
             {cpuProfile.status === 'RUNNING' ? <i className="fa fa-spinner fa-spin"></i> : null}
           </button>
