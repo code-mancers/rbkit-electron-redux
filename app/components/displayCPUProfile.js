@@ -11,7 +11,6 @@ class DisplayCPUProfile extends Component {
     this.handleRowExpansion = this.handleRowExpansion.bind(this);
     this.getlistOfSamples = this.getlistOfSamples.bind(this);
     this.getCallersof = this.getCallersof.bind(this);
-    this.createProfilingTable = this.createProfilingTable.bind(this);
     this.displayCPUProfilingTable = this.displayCPUProfilingTable.bind(this);
     this.createTableFromTopOfStack = this.createTableFromTopOfStack.bind(this);
     this.updateTableFromStore = this.updateTableFromStore.bind(this);
@@ -83,19 +82,31 @@ class DisplayCPUProfile extends Component {
   getCallersof(blockName) {
     let callers = {};
     for(let i=0; i<this.listOfSamples.length; i++) {
-      if (this.listOfSamples[i].split('-')[this.listOfSamples[i].split('-').length-1] === blockName) {
-        callers[blockName]? ++callers[blockName] : callers[blockName]=1;
+      const sample = this.listOfSamples[i];
+      if (sample.split('-')[sample.split('-').length-1] === blockName) {
+        const caller = this.listOfSamples[i+1].split('-')[this.listOfSamples[i+1].split('-').length-1];
+        callers[caller]? ++callers[caller] : callers[caller]=1;
       }
     }
     return callers;
   }
 
   handleRowExpansion(event) {
-    const callerBlockId = event.currentTarget.dataset.rowId;
+    let callerBlockId = event.currentTarget.dataset.rowId;
     const callerBlockName = event.currentTarget.dataset.blockName;
+    const callerBlockTime = event.currentTarget.dataset.blockTime;
     const callers = this.getCallersof(callerBlockName);
-    let abc = this.finalTable.splice(1, 0, [2, "test", 7.5]);
-    console.log('new sent')
+    let numberOfCallers = 0;
+    let newRowIdCount = 0;
+    for (var prop in callers) { numberOfCallers+=callers[prop]; }
+    for (var prop in callers) {
+      // console.log(callerBlockName + ' called by ' + prop);
+      let newRow = [];
+      newRow.push(callerBlockId + '_' + newRowIdCount++);
+      newRow.push(prop);
+      newRow.push((callers[prop]/numberOfCallers)*callerBlockTime);
+      this.finalTable.splice(++callerBlockId, 0, newRow);
+    }
     this.props.updateProfilingData(this.finalTable);
     this.tableLength = this.finalTable.length;
 
@@ -109,7 +120,7 @@ class DisplayCPUProfile extends Component {
   }
 
   createTableFromTopOfStack() {
-    console.log('from top of stack')
+    // console.log('from top of stack')
     this.finalTable = [];
     for (let i=0; i<this.sortedTopOfStack.length; i++) {
       let row = [];
@@ -123,7 +134,7 @@ class DisplayCPUProfile extends Component {
   }
 
   updateTableFromStore() {
-    console.log('from store')
+    // console.log('from store')
     this.finalTable = [];
     for (let i=0; i<this.sortedTopOfStack.length; i++) {
       let row = [];
@@ -135,31 +146,28 @@ class DisplayCPUProfile extends Component {
     this.tableLength = this.finalTable.length;
   }
 
-  createProfilingTable() {
-    let dataTable;
-    if(this.props.cpuProfilingTable.cpuProfilingTable.length === 0) {
-      console.log('in 1')
-      this.createTableFromTopOfStack()
-    } else {
-      console.log('in 2')
-      this.displayCPUProfilingTable();
-    }
-  }
+  // updateProfilingTable() {
+  //   this.props.cpuProfilingTable.cpuProfilingTable.length === 0 ? 
+  //     this.createTableFromTopOfStack() : this.displayCPUProfilingTable();
+  // }
 
   displayCPUProfilingTable() {
-    console.log('Displaying Profile Data')
-    const table = this.props.cpuProfilingTable.cpuProfilingTable;
     return (
       <table className="table table-bordered table-condensed">
         <tbody>
           {
-            table.map(row => {
+            this.props.cpuProfilingTable.cpuProfilingTable.map(row => {
               return (
                 <tr key={row[0]}>
                   <td>{row[1]}</td>
                   <td>
-                    {row[2] + 'ms'}
-                    <button className="btn btn-xs" data-row-id={row[0]} data-block-name={row[1]} onClick={this.handleRowExpansion}>
+                    {row[2] + 'ms '}
+                    <button className="btn btn-xs" 
+                      data-row-id={row[0]}
+                      data-block-name={row[1]}
+                      data-block-time={row[2]}
+                      onClick={this.handleRowExpansion}
+                    >
                       <i className="fa fa-caret-down" />
                     </button>
                   </td>
@@ -174,19 +182,14 @@ class DisplayCPUProfile extends Component {
 
   parseProfilingData() {
     if( this.props.data !== undefined) {
-      console.log('++++++++++++')
-      console.log(this.props.cpuProfilingTable.cpuProfilingTable.length);
-      console.log(this.tableLength);
+      // console.log('++++++++++++')
+      // console.log(this.props.cpuProfilingTable.cpuProfilingTable.length);
+      // console.log(this.tableLength);
       const condition1 = (this.props.cpuProfilingTable.cpuProfilingTable.length === 0) && (this.tableLength === 0);
       const condition2 = this.props.cpuProfilingTable.cpuProfilingTable.length !== this.tableLength;
-      console.log(condition1);
-      console.log(condition2);
-      if (condition1 || condition2) {
-        this.createProfilingTable();
-      } else {
-        console.log('just display')
-        return this.displayCPUProfilingTable();
-      }
+      // console.log(condition1);
+      // console.log(condition2);
+      return condition1 || condition2 ? this.createTableFromTopOfStack() : this.displayCPUProfilingTable();
     }
   }
 
@@ -194,7 +197,6 @@ class DisplayCPUProfile extends Component {
     return (
       <div className='col-md-10 col-md-offset-1'>
         {this.parseProfilingData()}
-        {console.log('end')}
       </div>
     )
   }
