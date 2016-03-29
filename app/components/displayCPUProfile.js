@@ -13,7 +13,6 @@ class DisplayCPUProfile extends Component {
     this.getCallersOfBlock = this.getCallersOfBlock.bind(this);
     this.displayCPUProfilingTable = this.displayCPUProfilingTable.bind(this);
     this.createTableFromTopOfStack = this.createTableFromTopOfStack.bind(this);
-    this.updateTableFromStore = this.updateTableFromStore.bind(this);
     this.getIndexOfRowWithId = this.getIndexOfRowWithId.bind(this);
   }
 
@@ -114,12 +113,14 @@ class DisplayCPUProfile extends Component {
     let maxId = event.currentTarget.dataset.maxId;
     let numberOfCallers = 0;
     let insertNewRowAt = this.getIndexOfRowWithId(callerBlockId);
+    this.finalTable[insertNewRowAt][3] = "fa fa-caret-down";
     for (var prop in callers) { numberOfCallers+=callers[prop]; }
     for (var prop in callers) {
       let newRow = [];
-      newRow.push(++maxId);
+      newRow.push(maxId++);
       newRow.push(prop);
       newRow.push((callers[prop]/numberOfCallers)*callerBlockTime);
+      newRow.push("fa fa-caret-right")
       this.finalTable.splice(++insertNewRowAt, 0, newRow);
     }
     this.props.updateProfilingData(this.finalTable);
@@ -133,27 +134,17 @@ class DisplayCPUProfile extends Component {
       row.push(i);
       row.push(this.sortedTopOfStack[i]);
       row.push(Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100);
+      row.push("fa fa-caret-right")
       this.finalTable.push(row)
     };
     this.tableLength = this.finalTable.length;
     this.props.updateProfilingData(this.finalTable);
   }
 
-  updateTableFromStore() {
-    this.finalTable = [];
-    for (let i=0; i<this.sortedTopOfStack.length; i++) {
-      let row = [];
-      row.push(i);
-      row.push(this.sortedTopOfStack[i]);
-      row.push(Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100);
-      this.finalTable.push(row)
-    };
-    this.tableLength = this.finalTable.length;
-  }
-
   displayCPUProfilingTable() {
     return (
       <table className="table table-bordered table-condensed">
+        <thead><th>Total</th><th>Function</th></thead>
         <tbody>
           {
             this.props.cpuProfilingTable.cpuProfilingTable.map(row => {
@@ -161,16 +152,14 @@ class DisplayCPUProfile extends Component {
                 <tr key={row[0]}>
                   <td>{row[1].split('-')[row[1].split('-').length-1]}</td>
                   <td>
-                    {row[2] + 'ms '}
-                    <button className="btn btn-xs" 
+                    <i className={row[3]}
                       data-row-id={row[0]}
                       data-block-name={row[1]}
                       data-block-time={row[2]}
                       data-max-id={this.props.cpuProfilingTable.cpuProfilingTable.length}
                       onClick={this.handleRowExpansion}
-                    >
-                      <i className="fa fa-caret-down" />
-                    </button>
+                    />
+                    {' ' + row[2] + 'ms'}
                   </td>
                 </tr>
               )
