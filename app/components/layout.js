@@ -20,6 +20,7 @@ class Layout extends React.Component {
   }
 
   disconnect() {
+    this.props.dispatch(stopCpuProfiling());
     this.props.dispatch(disconnectFromServer());
   }
 
