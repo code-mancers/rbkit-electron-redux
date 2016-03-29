@@ -5,12 +5,12 @@ class DisplayCPUProfile extends Component {
   constructor() {
     super(...arguments);
     this.parseProfilingData = this.parseProfilingData.bind(this);
-    this.getSamplesFromDump = this.getSamplesFromDump.bind(this);
-    this.getTopOfStack = this.getTopOfStack.bind(this);
-    this.getMethodCountInStack = this.getMethodCountInStack.bind(this);
+    this.getAllSamplesFromDump = this.getAllSamplesFromDump.bind(this);
+    this.getBlocksFromTopOfStack = this.getBlocksFromTopOfStack.bind(this);
+    this.getBlockCountFromStack = this.getBlockCountFromStack.bind(this);
     this.handleRowExpansion = this.handleRowExpansion.bind(this);
-    this.getlistOfSamples = this.getlistOfSamples.bind(this);
-    this.getCallersof = this.getCallersof.bind(this);
+    this.getlistOfBlockIdentifiers = this.getlistOfBlockIdentifiers.bind(this);
+    this.getCallersOfBlock = this.getCallersOfBlock.bind(this);
     this.displayCPUProfilingTable = this.displayCPUProfilingTable.bind(this);
     this.createTableFromTopOfStack = this.createTableFromTopOfStack.bind(this);
     this.updateTableFromStore = this.updateTableFromStore.bind(this);
@@ -19,42 +19,42 @@ class DisplayCPUProfile extends Component {
 
   componentWillMount() {
     if( this.props.data !== undefined) {
-      this.cpuSamples = this.getSamplesFromDump();
-      this.topOfStack = this.getTopOfStack();
-      this.sortedTopOfStack = Object.keys(this.topOfStack).sort(function(a,b){ return this.topOfStack[a]-this.topOfStack[b]}.bind(this)).reverse();
-      this.methodCountInStack = this.getMethodCountInStack();
+      this.allCPUSamples = this.getAllSamplesFromDump();
+      this.blocksFromTopOfStack = this.getBlocksFromTopOfStack();
+      this.sortedTopOfStack = Object.keys(this.blocksFromTopOfStack).sort(function(a,b){ return this.blocksFromTopOfStack[a]-this.blocksFromTopOfStack[b]}.bind(this)).reverse();
+      this.blockCountFromStack = this.getBlockCountFromStack();
       this.executionTime = this.getExecutionTime();
-      this.listOfSamples = this.getlistOfSamples();
+      this.listOfBlockIdentifiers = this.getlistOfBlockIdentifiers();
       this.finalTable = [];
       this.tableLength = 0;
     }
   }
 
-  getSamplesFromDump() {
+  getAllSamplesFromDump() {
     const dump = this.props.data.data;
-    let cpuSamples = [];
+    let allCPUSamples = [];
     dump.forEach(function(samples) {
       samples[2].forEach(function(sample) {
-        cpuSamples.push(sample);
+        allCPUSamples.push(sample);
       });
     });
-    return cpuSamples;
+    return allCPUSamples;
   }
 
-  getTopOfStack() {
-    const cpuSamples = this.cpuSamples;
+  getBlocksFromTopOfStack() {
+    const allCPUSamples = this.allCPUSamples;
     let topOfStack = {};
-    cpuSamples.forEach(function(sample) {
+    allCPUSamples.forEach(function(sample) {
       const sampleIdentifier = sample[2][0][6].concat(' ', sample[2][0][7], ' ', sample[2][0][13].replace(/ /g, '_')).replace(/ /g, '-');
       topOfStack[sampleIdentifier]? ++topOfStack[sampleIdentifier] : topOfStack[sampleIdentifier]=1;
     });
     return topOfStack;
   }
 
-  getMethodCountInStack() {
-    const cpuSamples = this.cpuSamples;
+  getBlockCountFromStack() {
+    const allCPUSamples = this.allCPUSamples;
     let methodCountInStack = {};
-    cpuSamples.forEach(function(sample) {
+    allCPUSamples.forEach(function(sample) {
       const sampleIdentifier = sample[2][0][6].concat(' ', sample[2][0][7], ' ', sample[2][0][13].replace(/ /g, '_')).replace(/ /g, '-');
       methodCountInStack[sampleIdentifier]? ++methodCountInStack[sampleIdentifier] : methodCountInStack[sampleIdentifier]=1;
     });
@@ -62,31 +62,36 @@ class DisplayCPUProfile extends Component {
   }
 
   getExecutionTime() {
-    const cpuSamples = this.cpuSamples;
-    if (cpuSamples[0]) {
-      return (cpuSamples[cpuSamples.length-1][1] - cpuSamples[0][1]);
+    const allCPUSamples = this.allCPUSamples;
+    if (allCPUSamples[0]) {
+      return (allCPUSamples[allCPUSamples.length-1][1] - allCPUSamples[0][1]);
     }
   }
 
-  getlistOfSamples() {
-    const cpuSamples = this.cpuSamples;
-    let listOfSamples = [];
-    cpuSamples.forEach(function(samples) {
+  getlistOfBlockIdentifiers() {
+    const allCPUSamples = this.allCPUSamples;
+    let listOfBlockIdentifiers = [];
+    allCPUSamples.forEach(function(samples) {
+      let singleBlockIdentifier = [];
       samples[2].forEach(function(sample) {
         const sampleIdentifier = sample[6].concat(' ', sample[7], ' ', sample[13].replace(/ /g, '_')).replace(/ /g, '-');
-        listOfSamples.push(sampleIdentifier);
+        singleBlockIdentifier.push(sampleIdentifier);
       });
+      listOfBlockIdentifiers.push(singleBlockIdentifier);
     });
-    return listOfSamples;
+    return listOfBlockIdentifiers;
   }
 
-  getCallersof(blockName) {
+  getCallersOfBlock(blockName) {
     let callers = {};
-    for(let i=0; i<this.listOfSamples.length; i++) {
-      const sample = this.listOfSamples[i];
-      if (sample.split('-')[sample.split('-').length-1] === blockName) {
-        const caller = this.listOfSamples[i+1].split('-')[this.listOfSamples[i+1].split('-').length-1];
-        callers[caller]? ++callers[caller] : callers[caller]=1;
+    for(let i=0; i<this.listOfBlockIdentifiers.length; i++) {
+      const blockIdentifier = this.listOfBlockIdentifiers[i];
+      for(let j=0; j<blockIdentifier.length; j++) {
+        const blockIdentifierMethod = blockIdentifier[j];
+        if ((blockIdentifierMethod === blockName) && (j+1!=blockIdentifier.length)) {
+          const caller = blockIdentifier[j+1];
+          callers[caller]? ++callers[caller] : callers[caller]=1;
+        }
       }
     }
     return callers;
@@ -96,7 +101,6 @@ class DisplayCPUProfile extends Component {
     const table = this.props.cpuProfilingTable.cpuProfilingTable;
     let rowIndex;
     for (let i=0; i<table.length; i++) {
-      console.log(table[i][0] == id);
       if (table[i][0] == id) { rowIndex = i; break; }
     }
     return rowIndex;
@@ -105,36 +109,30 @@ class DisplayCPUProfile extends Component {
   handleRowExpansion(event) {    
     const callerBlockName = event.currentTarget.dataset.blockName;
     const callerBlockTime = event.currentTarget.dataset.blockTime;
-    const callers = this.getCallersof(callerBlockName);
     const callerBlockId = event.currentTarget.dataset.rowId;
+    const callers = this.getCallersOfBlock(callerBlockName);
     let maxId = event.currentTarget.dataset.maxId;
     let numberOfCallers = 0;
     let insertNewRowAt = this.getIndexOfRowWithId(callerBlockId);
-    // console.log('calling row ' + callerBlockId);
     for (var prop in callers) { numberOfCallers+=callers[prop]; }
     for (var prop in callers) {
-      // console.log(' Entered the loop ');
       let newRow = [];
       newRow.push(++maxId);
       newRow.push(prop);
       newRow.push((callers[prop]/numberOfCallers)*callerBlockTime);
-      // console.log('new row ' + newRow[0])
-      // console.log('adding new row at ' + insertNewRowAt)
       this.finalTable.splice(++insertNewRowAt, 0, newRow);
-      // console.log('newRow updated to ' + insertNewRowAt)
     }
     this.props.updateProfilingData(this.finalTable);
     this.tableLength = this.finalTable.length;
   }
 
   createTableFromTopOfStack() {
-    // console.log('from top of stack')
     this.finalTable = [];
     for (let i=0; i<this.sortedTopOfStack.length; i++) {
       let row = [];
       row.push(i);
-      row.push(this.sortedTopOfStack[i].split('-')[this.sortedTopOfStack[i].split('-').length-1]);
-      row.push(Math.round((this.topOfStack[this.sortedTopOfStack[i]]*100/this.cpuSamples.length)*this.executionTime)/100);
+      row.push(this.sortedTopOfStack[i]);
+      row.push(Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100);
       this.finalTable.push(row)
     };
     this.tableLength = this.finalTable.length;
@@ -142,13 +140,12 @@ class DisplayCPUProfile extends Component {
   }
 
   updateTableFromStore() {
-    // console.log('from store')
     this.finalTable = [];
     for (let i=0; i<this.sortedTopOfStack.length; i++) {
       let row = [];
       row.push(i);
-      row.push(this.sortedTopOfStack[i].split('-')[this.sortedTopOfStack[i].split('-').length-1]);
-      row.push(Math.round((this.topOfStack[this.sortedTopOfStack[i]]*100/this.cpuSamples.length)*this.executionTime)/100);
+      row.push(this.sortedTopOfStack[i]);
+      row.push(Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100);
       this.finalTable.push(row)
     };
     this.tableLength = this.finalTable.length;
@@ -162,7 +159,7 @@ class DisplayCPUProfile extends Component {
             this.props.cpuProfilingTable.cpuProfilingTable.map(row => {
               return (
                 <tr key={row[0]}>
-                  <td>{row[1]}</td>
+                  <td>{row[1].split('-')[row[1].split('-').length-1]}</td>
                   <td>
                     {row[2] + 'ms '}
                     <button className="btn btn-xs" 
@@ -186,13 +183,8 @@ class DisplayCPUProfile extends Component {
 
   parseProfilingData() {
     if( this.props.data !== undefined) {
-      // console.log('++++++++++++')
-      // console.log(this.props.cpuProfilingTable.cpuProfilingTable.length);
-      // console.log(this.tableLength);
       const condition1 = (this.props.cpuProfilingTable.cpuProfilingTable.length === 0) && (this.tableLength === 0);
       const condition2 = this.props.cpuProfilingTable.cpuProfilingTable.length !== this.tableLength;
-      // console.log(condition1);
-      // console.log(condition2);
       return condition1 || condition2 ? this.createTableFromTopOfStack() : this.displayCPUProfilingTable();
     }
   }
