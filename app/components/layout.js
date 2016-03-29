@@ -58,7 +58,7 @@ class Layout extends React.Component {
               <div className="col-md-12">Data Count : {this.props.cpuProfile.data.length} </div>
             </div>
             <div className="row">
-              <DisplayHandshake data={this.props.handshake}/>
+              {this.props.handshake ? <DisplayHandshake data={this.props.handshake}/> : null}
             </div>
           </div>
         </div>
