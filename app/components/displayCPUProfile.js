@@ -14,6 +14,7 @@ class DisplayCPUProfile extends Component {
     this.displayCPUProfilingTable = this.displayCPUProfilingTable.bind(this);
     this.createTableFromTopOfStack = this.createTableFromTopOfStack.bind(this);
     this.updateTableFromStore = this.updateTableFromStore.bind(this);
+    this.getIndexOfRowWithId = this.getIndexOfRowWithId.bind(this);
   }
 
   componentWillMount() {
@@ -91,32 +92,39 @@ class DisplayCPUProfile extends Component {
     return callers;
   }
 
-  handleRowExpansion(event) {
-    let callerBlockId = event.currentTarget.dataset.rowId;
+  getIndexOfRowWithId(id) {
+    const table = this.props.cpuProfilingTable.cpuProfilingTable;
+    let rowIndex;
+    for (let i=0; i<table.length; i++) {
+      console.log(table[i][0] == id);
+      if (table[i][0] == id) { rowIndex = i; break; }
+    }
+    return rowIndex;
+  }
+
+  handleRowExpansion(event) {    
     const callerBlockName = event.currentTarget.dataset.blockName;
     const callerBlockTime = event.currentTarget.dataset.blockTime;
     const callers = this.getCallersof(callerBlockName);
+    const callerBlockId = event.currentTarget.dataset.rowId;
+    let maxId = event.currentTarget.dataset.maxId;
     let numberOfCallers = 0;
-    let newRowIdCount = 0;
+    let insertNewRowAt = this.getIndexOfRowWithId(callerBlockId);
+    // console.log('calling row ' + callerBlockId);
     for (var prop in callers) { numberOfCallers+=callers[prop]; }
     for (var prop in callers) {
-      // console.log(callerBlockName + ' called by ' + prop);
+      // console.log(' Entered the loop ');
       let newRow = [];
-      newRow.push(callerBlockId + '_' + newRowIdCount++);
+      newRow.push(++maxId);
       newRow.push(prop);
       newRow.push((callers[prop]/numberOfCallers)*callerBlockTime);
-      this.finalTable.splice(++callerBlockId, 0, newRow);
+      // console.log('new row ' + newRow[0])
+      // console.log('adding new row at ' + insertNewRowAt)
+      this.finalTable.splice(++insertNewRowAt, 0, newRow);
+      // console.log('newRow updated to ' + insertNewRowAt)
     }
     this.props.updateProfilingData(this.finalTable);
     this.tableLength = this.finalTable.length;
-
-    // for (var prop in callers) {
-    //   let row = [];
-    //   row.push(000);
-    //   row.push(prop);
-    //   row.push(Math.round((this.topOfStack[this.sortedTopOfStack[i]]*100/this.cpuSamples.length)*this.executionTime)/100);
-    //   // this.finalTable.push(row)
-    // };
   }
 
   createTableFromTopOfStack() {
@@ -146,11 +154,6 @@ class DisplayCPUProfile extends Component {
     this.tableLength = this.finalTable.length;
   }
 
-  // updateProfilingTable() {
-  //   this.props.cpuProfilingTable.cpuProfilingTable.length === 0 ? 
-  //     this.createTableFromTopOfStack() : this.displayCPUProfilingTable();
-  // }
-
   displayCPUProfilingTable() {
     return (
       <table className="table table-bordered table-condensed">
@@ -166,6 +169,7 @@ class DisplayCPUProfile extends Component {
                       data-row-id={row[0]}
                       data-block-name={row[1]}
                       data-block-time={row[2]}
+                      data-max-id={this.props.cpuProfilingTable.cpuProfilingTable.length}
                       onClick={this.handleRowExpansion}
                     >
                       <i className="fa fa-caret-down" />
@@ -196,7 +200,7 @@ class DisplayCPUProfile extends Component {
   render() {
     return (
       <div className='col-md-10 col-md-offset-1'>
-        {this.parseProfilingData()}
+        { this.parseProfilingData() }
       </div>
     )
   }
