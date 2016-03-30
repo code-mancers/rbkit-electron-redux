@@ -8,12 +8,15 @@ class DisplayCPUProfile extends Component {
     this.getAllSamplesFromDump = this.getAllSamplesFromDump.bind(this);
     this.getBlocksFromTopOfStack = this.getBlocksFromTopOfStack.bind(this);
     this.getBlockCountFromStack = this.getBlockCountFromStack.bind(this);
-    this.createSubRows = this.createSubRows.bind(this);
     this.getlistOfBlockIdentifiers = this.getlistOfBlockIdentifiers.bind(this);
     this.getCallersOfBlock = this.getCallersOfBlock.bind(this);
     this.displayCPUProfilingTable = this.displayCPUProfilingTable.bind(this);
     this.initializeTable = this.initializeTable.bind(this);
     this.getIndexOfRowWithId = this.getIndexOfRowWithId.bind(this);
+    this.handleSubRows = this.handleSubRows.bind(this);
+    this.createSubRows = this.createSubRows.bind(this);
+    this.hideSubRows = this.hideSubRows.bind(this);
+    this.showSubRows = this.showSubRows.bind(this);
   }
 
   componentWillMount() {
@@ -59,6 +62,7 @@ class DisplayCPUProfile extends Component {
     });
     return methodCountInStack;
   }
+
 
   getExecutionTime() {
     const allCPUSamples = this.allCPUSamples;
@@ -117,38 +121,70 @@ class DisplayCPUProfile extends Component {
     const callerBlockName = event.currentTarget.dataset.blockName;
     const callerBlockTime = event.currentTarget.dataset.blockTime;
     const callers = this.getCallersOfBlock(callerBlockName);
-    const callerRowId = event.currentTarget.dataset.rowId;
-    let callerRowIndex = this.getIndexOfRowWithId(callerRowId);
+    const callerObjectId = event.currentTarget.dataset.rowId;
+    const callerRowIndex = this.getIndexOfRowWithId(callerObjectId);
     let insertNewRowAt = callerRowIndex;
     let maxId = event.currentTarget.dataset.maxId;
-    let numberOfCallers = 0;    
+    let numberOfCallers = 0;
     this.updatedTable[callerRowIndex]['open'] = true;
     for (var prop in callers) { numberOfCallers+=callers[prop]; }
     for (var prop in callers) {
       let newRow = {};
       this.updatedTable[callerRowIndex]['children'].push(maxId)
-      this.notifyParentsOfNewChild(callerRowId, maxId);
+      this.notifyParentsOfNewChild(callerObjectId, maxId);
       newRow['id']=maxId++;
       newRow['blockName']=prop;
       newRow['self']=Math.round((callers[prop]*100/numberOfCallers)*callerBlockTime)/100;
       newRow['open']=false;
       newRow['children'] = [];
+      newRow['hidden']=false;
       this.updatedTable.splice(++insertNewRowAt, 0, newRow);
     }
     this.props.updateProfilingData(this.updatedTable);
     this.updatedTableLength = this.updatedTable.length;
   }
 
+  handleSubRows(event) {
+    const callerObjectId = event.currentTarget.dataset.rowId;
+    const callerRowIndex = this.getIndexOfRowWithId(callerObjectId);
+    this.updatedTable[callerRowIndex]['open'] ? this.hideSubRows(callerRowIndex) : 
+      this.updatedTable[callerRowIndex]['children'].length > 0 ? this.showSubRows(callerRowIndex) :
+        this.createSubRows(event);
+  }
+
+  hideSubRows(objectIndex) {
+    const rowsToHide = this.updatedTable[objectIndex]['children'];
+    this.updatedTable[objectIndex]['open']=false;
+    this.updatedTable.forEach(function(rowObject) {
+      if (rowsToHide.indexOf(String(rowObject['id'])) > -1) {
+        rowObject['hidden']=true;
+      }
+    });
+    this.props.updateProfilingData(this.updatedTable);
+  }
+
+  showSubRows(objectIndex) {
+    this.updatedTable[objectIndex]['open']=true;
+    const rowsToShow = this.updatedTable[objectIndex]['children'];
+    this.updatedTable.forEach(function(rowObject) {
+      if (rowsToShow.indexOf(String(rowObject['id'])) > -1) {
+        rowObject['hidden']=false;
+      }
+    });
+    this.props.updateProfilingData(this.updatedTable);
+  }
+
   initializeTable() {
     this.updatedTable = [];
     for (let i=0; i<this.sortedTopOfStack.length; i++) {
-      let row = {};
-      row['id']=i;
-      row['blockName']=this.sortedTopOfStack[i];
-      row['self'] = Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100;
-      row['open'] = false;
-      row['children'] = [];
-      this.updatedTable.push(row);
+      let newRow = {};
+      newRow['id']=i;
+      newRow['blockName']=this.sortedTopOfStack[i];
+      newRow['self'] = Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100;
+      newRow['open'] = false;
+      newRow['children'] = [];
+      newRow['hidden']=false;
+      this.updatedTable.push(newRow);
     };
     this.updatedTableLength = this.updatedTable.length;
     this.props.updateProfilingData(this.updatedTable);
@@ -161,22 +197,24 @@ class DisplayCPUProfile extends Component {
         <tbody>
           {
             this.props.cpuProfilingTable.cpuProfilingTable.map(row => {
-              return (
-                <tr key={row['id']}>
-                  <td>{row['id']}</td>
-                  <td>{row['blockName'].split('-')[row['blockName'].split('-').length-1]}</td>
-                  <td>
-                    <i className={row['open'] ? 'fa fa-caret-down' : 'fa fa-caret-right'}
-                      data-row-id={row['id']}
-                      data-block-name={row['blockName']}
-                      data-block-time={row['self']}
-                      data-max-id={this.props.cpuProfilingTable.cpuProfilingTable.length}
-                      onClick={this.createSubRows}
-                    />
-                    {' ' + row['self'] + ' ms'}
-                  </td>
-                </tr>
-              )
+              if (!row['hidden']) {
+                return (
+                  <tr key={row['id']}>
+                    <td>{row['id']}</td>
+                    <td>{row['blockName'].split('-')[row['blockName'].split('-').length-1]}</td>
+                    <td>
+                      <i className={row['open'] ? 'fa fa-caret-down' : 'fa fa-caret-right'}
+                        data-row-id={row['id']}
+                        data-block-name={row['blockName']}
+                        data-block-time={row['self']}
+                        data-max-id={this.props.cpuProfilingTable.cpuProfilingTable.length}
+                        onClick={this.handleSubRows}
+                      />
+                      {' ' + row['self'] + ' ms'}
+                    </td>
+                  </tr>
+                )
+              }
             })
           }
         </tbody>
