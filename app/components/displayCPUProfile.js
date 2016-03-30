@@ -4,19 +4,7 @@ class DisplayCPUProfile extends Component {
 
   constructor() {
     super(...arguments);
-    this.parseProfilingData = this.parseProfilingData.bind(this);
-    this.getAllSamplesFromDump = this.getAllSamplesFromDump.bind(this);
-    this.getBlocksFromTopOfStack = this.getBlocksFromTopOfStack.bind(this);
-    this.getBlockCountFromStack = this.getBlockCountFromStack.bind(this);
-    this.getlistOfBlockIdentifiers = this.getlistOfBlockIdentifiers.bind(this);
-    this.getCallersOfBlock = this.getCallersOfBlock.bind(this);
-    this.displayCPUProfilingTable = this.displayCPUProfilingTable.bind(this);
-    this.initializeTable = this.initializeTable.bind(this);
-    this.getIndexOfRowWithId = this.getIndexOfRowWithId.bind(this);
     this.handleSubRows = this.handleSubRows.bind(this);
-    this.createSubRows = this.createSubRows.bind(this);
-    this.hideSubRows = this.hideSubRows.bind(this);
-    this.showSubRows = this.showSubRows.bind(this);
   }
 
   componentWillMount() {
@@ -138,6 +126,7 @@ class DisplayCPUProfile extends Component {
       newRow['open']=false;
       newRow['children'] = [];
       newRow['hidden']=false;
+      newRow['nestedLevel']=this.updatedTable[callerRowIndex]['nestedLevel']+1;
       this.updatedTable.splice(++insertNewRowAt, 0, newRow);
     }
     this.props.updateProfilingData(this.updatedTable);
@@ -184,25 +173,30 @@ class DisplayCPUProfile extends Component {
       newRow['open'] = false;
       newRow['children'] = [];
       newRow['hidden']=false;
+      newRow['nestedLevel']=1;
       this.updatedTable.push(newRow);
     };
     this.updatedTableLength = this.updatedTable.length;
     this.props.updateProfilingData(this.updatedTable);
   }
 
+  getStyle(nestedLevel) {
+    const padding = (nestedLevel*15) + "px";
+    return {paddingLeft: padding};
+  }
+
   displayCPUProfilingTable() {
     return (
       <table className="table table-bordered table-condensed">
-        <thead><th>Id</th><th>Total</th><th>Function</th></thead>
+        <thead><th>Total</th><th>Function</th></thead>
         <tbody>
           {
             this.props.cpuProfilingTable.cpuProfilingTable.map(row => {
               if (!row['hidden']) {
                 return (
                   <tr key={row['id']}>
-                    <td>{row['id']}</td>
-                    <td>{row['blockName'].split('-')[row['blockName'].split('-').length-1]}</td>
-                    <td>
+                    <td style={this.getStyle(row['nestedLevel'])}>{row['blockName'].split('-')[row['blockName'].split('-').length-1]}</td>
+                    <td style={{paddingLeft:"15px"}}>
                       <i className={row['open'] ? 'fa fa-caret-down' : 'fa fa-caret-right'}
                         data-row-id={row['id']}
                         data-block-name={row['blockName']}
