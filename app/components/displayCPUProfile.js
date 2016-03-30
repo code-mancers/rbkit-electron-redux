@@ -8,11 +8,11 @@ class DisplayCPUProfile extends Component {
     this.getAllSamplesFromDump = this.getAllSamplesFromDump.bind(this);
     this.getBlocksFromTopOfStack = this.getBlocksFromTopOfStack.bind(this);
     this.getBlockCountFromStack = this.getBlockCountFromStack.bind(this);
-    this.handleRowExpansion = this.handleRowExpansion.bind(this);
+    this.createSubRows = this.createSubRows.bind(this);
     this.getlistOfBlockIdentifiers = this.getlistOfBlockIdentifiers.bind(this);
     this.getCallersOfBlock = this.getCallersOfBlock.bind(this);
     this.displayCPUProfilingTable = this.displayCPUProfilingTable.bind(this);
-    this.createTableFromTopOfStack = this.createTableFromTopOfStack.bind(this);
+    this.initializeTable = this.initializeTable.bind(this);
     this.getIndexOfRowWithId = this.getIndexOfRowWithId.bind(this);
   }
 
@@ -100,12 +100,12 @@ class DisplayCPUProfile extends Component {
     const table = this.props.cpuProfilingTable.cpuProfilingTable;
     let rowIndex;
     for (let i=0; i<table.length; i++) {
-      if (table[i][0] == id) { rowIndex = i; break; }
+      if (table[i]['id'] == id) { rowIndex = i; break; }
     }
     return rowIndex;
   }
 
-  handleRowExpansion(event) {    
+  createSubRows(event) {    
     const callerBlockName = event.currentTarget.dataset.blockName;
     const callerBlockTime = event.currentTarget.dataset.blockTime;
     const callerBlockId = event.currentTarget.dataset.rowId;
@@ -113,28 +113,28 @@ class DisplayCPUProfile extends Component {
     let maxId = event.currentTarget.dataset.maxId;
     let numberOfCallers = 0;
     let insertNewRowAt = this.getIndexOfRowWithId(callerBlockId);
-    this.finalTable[insertNewRowAt][3] = "fa fa-caret-down";
+    this.finalTable[insertNewRowAt]['open'] = true;
     for (var prop in callers) { numberOfCallers+=callers[prop]; }
     for (var prop in callers) {
-      let newRow = [];
-      newRow.push(maxId++);
-      newRow.push(prop);
-      newRow.push((callers[prop]/numberOfCallers)*callerBlockTime);
-      newRow.push("fa fa-caret-right")
+      let newRow = {};
+      newRow['id']=maxId++;
+      newRow['blockName']=prop;
+      newRow['self']=Math.round((callers[prop]*100/numberOfCallers)*callerBlockTime)/100;
+      newRow['open']=false
       this.finalTable.splice(++insertNewRowAt, 0, newRow);
     }
     this.props.updateProfilingData(this.finalTable);
     this.tableLength = this.finalTable.length;
   }
 
-  createTableFromTopOfStack() {
+  initializeTable() {
     this.finalTable = [];
     for (let i=0; i<this.sortedTopOfStack.length; i++) {
-      let row = [];
-      row.push(i);
-      row.push(this.sortedTopOfStack[i]);
-      row.push(Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100);
-      row.push("fa fa-caret-right")
+      let row = {};
+      row['id']=i;
+      row['blockName']=this.sortedTopOfStack[i];
+      row['self'] = Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100;
+      row['open'] = false;
       this.finalTable.push(row)
     };
     this.tableLength = this.finalTable.length;
@@ -149,17 +149,17 @@ class DisplayCPUProfile extends Component {
           {
             this.props.cpuProfilingTable.cpuProfilingTable.map(row => {
               return (
-                <tr key={row[0]}>
-                  <td>{row[1].split('-')[row[1].split('-').length-1]}</td>
+                <tr key={row['id']}>
+                  <td>{row['blockName'].split('-')[row['blockName'].split('-').length-1]}</td>
                   <td>
-                    <i className={row[3]}
-                      data-row-id={row[0]}
-                      data-block-name={row[1]}
-                      data-block-time={row[2]}
+                    <i className={row['open'] ? 'fa fa-caret-down' : 'fa fa-caret-right'}
+                      data-row-id={row['id']}
+                      data-block-name={row['blockName']}
+                      data-block-time={row['self']}
                       data-max-id={this.props.cpuProfilingTable.cpuProfilingTable.length}
-                      onClick={this.handleRowExpansion}
+                      onClick={this.createSubRows}
                     />
-                    {' ' + row[2] + 'ms'}
+                    {' ' + row['self'] + ' ms'}
                   </td>
                 </tr>
               )
@@ -171,10 +171,11 @@ class DisplayCPUProfile extends Component {
   }
 
   parseProfilingData() {
+    // TODO: Rename conditions, rename local table params length and finalTable
     if( this.props.data !== undefined) {
-      const condition1 = (this.props.cpuProfilingTable.cpuProfilingTable.length === 0) && (this.tableLength === 0);
+      const noDataInTable = (this.props.cpuProfilingTable.cpuProfilingTable.length === 0) && (this.tableLength === 0);
       const condition2 = this.props.cpuProfilingTable.cpuProfilingTable.length !== this.tableLength;
-      return condition1 || condition2 ? this.createTableFromTopOfStack() : this.displayCPUProfilingTable();
+      return noDataInTable || condition2 ? this.initializeTable() : this.displayCPUProfilingTable();
     }
   }
 
