@@ -24,8 +24,8 @@ class DisplayCPUProfile extends Component {
       this.blockCountFromStack = this.getBlockCountFromStack();
       this.executionTime = this.getExecutionTime();
       this.listOfBlockIdentifiers = this.getlistOfBlockIdentifiers();
-      this.finalTable = [];
-      this.tableLength = 0;
+      this.updatedTable = [];
+      this.updatedTableLength = 0;
     }
   }
 
@@ -105,51 +105,65 @@ class DisplayCPUProfile extends Component {
     return rowIndex;
   }
 
-  createSubRows(event) {    
+  notifyParentsOfNewChild(immediateParent, child) {
+    this.updatedTable.forEach(function(row) {
+     if (row['children'].indexOf(String(immediateParent)) > -1) {
+        row['children'].push(child);
+      }
+    });
+  }
+
+  createSubRows(event) {
     const callerBlockName = event.currentTarget.dataset.blockName;
     const callerBlockTime = event.currentTarget.dataset.blockTime;
-    const callerBlockId = event.currentTarget.dataset.rowId;
     const callers = this.getCallersOfBlock(callerBlockName);
+    const callerRowId = event.currentTarget.dataset.rowId;
+    let callerRowIndex = this.getIndexOfRowWithId(callerRowId);
+    let insertNewRowAt = callerRowIndex;
     let maxId = event.currentTarget.dataset.maxId;
-    let numberOfCallers = 0;
-    let insertNewRowAt = this.getIndexOfRowWithId(callerBlockId);
-    this.finalTable[insertNewRowAt]['open'] = true;
+    let numberOfCallers = 0;    
+    this.updatedTable[callerRowIndex]['open'] = true;
     for (var prop in callers) { numberOfCallers+=callers[prop]; }
     for (var prop in callers) {
       let newRow = {};
+      this.updatedTable[callerRowIndex]['children'].push(maxId)
+      this.notifyParentsOfNewChild(callerRowId, maxId);
       newRow['id']=maxId++;
       newRow['blockName']=prop;
       newRow['self']=Math.round((callers[prop]*100/numberOfCallers)*callerBlockTime)/100;
-      newRow['open']=false
-      this.finalTable.splice(++insertNewRowAt, 0, newRow);
+      newRow['open']=false;
+      newRow['children'] = [];
+      this.updatedTable.splice(++insertNewRowAt, 0, newRow);
     }
-    this.props.updateProfilingData(this.finalTable);
-    this.tableLength = this.finalTable.length;
+    this.props.updateProfilingData(this.updatedTable);
+    this.updatedTableLength = this.updatedTable.length;
   }
 
   initializeTable() {
-    this.finalTable = [];
+    this.updatedTable = [];
     for (let i=0; i<this.sortedTopOfStack.length; i++) {
       let row = {};
       row['id']=i;
       row['blockName']=this.sortedTopOfStack[i];
       row['self'] = Math.round((this.blocksFromTopOfStack[this.sortedTopOfStack[i]]*100/this.allCPUSamples.length)*this.executionTime)/100;
       row['open'] = false;
-      this.finalTable.push(row)
+      row['children'] = [];
+      this.updatedTable.push(row);
     };
-    this.tableLength = this.finalTable.length;
-    this.props.updateProfilingData(this.finalTable);
+    this.updatedTableLength = this.updatedTable.length;
+    this.props.updateProfilingData(this.updatedTable);
   }
 
   displayCPUProfilingTable() {
     return (
       <table className="table table-bordered table-condensed">
-        <thead><th>Total</th><th>Function</th></thead>
+        <thead><th>Id</th><th>Total</th><th>Function</th></thead>
         <tbody>
           {
             this.props.cpuProfilingTable.cpuProfilingTable.map(row => {
               return (
                 <tr key={row['id']}>
+                  <td>{row['id']}</td>
                   <td>{row['blockName'].split('-')[row['blockName'].split('-').length-1]}</td>
                   <td>
                     <i className={row['open'] ? 'fa fa-caret-down' : 'fa fa-caret-right'}
@@ -171,10 +185,10 @@ class DisplayCPUProfile extends Component {
   }
 
   parseProfilingData() {
-    // TODO: Rename conditions, rename local table params length and finalTable
+    // TODO: Rename conditions
     if( this.props.data !== undefined) {
-      const noDataInTable = (this.props.cpuProfilingTable.cpuProfilingTable.length === 0) && (this.tableLength === 0);
-      const condition2 = this.props.cpuProfilingTable.cpuProfilingTable.length !== this.tableLength;
+      const noDataInTable = (this.props.cpuProfilingTable.cpuProfilingTable.length === 0) && (this.updatedTableLength === 0);
+      const condition2 = this.props.cpuProfilingTable.cpuProfilingTable.length !== this.updatedTableLength;
       return noDataInTable || condition2 ? this.initializeTable() : this.displayCPUProfilingTable();
     }
   }
