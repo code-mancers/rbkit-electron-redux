@@ -37,12 +37,18 @@ class Layout extends React.Component {
   }
 
   render() {
+    let toolbelt = null;
+    if (this.props.status === 'CONNECTED') {
+      toolbelt = <Toolbelt {...this.props}
+                    handshake={this.handshake}
+                    handleCpuSampling={this.cpuProfiling}/>;
+    }
     return (
       <div>
         <Navbar {...this.props} handleConnect={this.connect} handleDisconnect={this.disconnect}/>
         <div className="container">
           <div className="row tools-wrapper">
-            <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
+            {toolbelt}
             <div className="row">
               <div className="col-md-12">Data Count : {this.props.cpuProfile.data.length} </div>
             </div>
