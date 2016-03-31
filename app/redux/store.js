@@ -31,28 +31,31 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
 
       switch (type) {
         case 'CONNECT':
-          zmq.connect(`tcp://${sock.ip || 'localhost'}:5556`);
-          subzmq.connect(`tcp://${sock.ip || 'localhost'}:5555`);
+          zmq.connect('tcp://localhost:5556');
+          subzmq.connect('tcp://localhost:5555');
 
           break;
         case 'COMMAND':
-          if (sock.cmd !== "handshake") {
+          if (sock.cmd && sock.cmd.indexOf('start') === 0) {
             subzmq.subscribe('');
           }
+          if (sock.cmd && sock.cmd.indexOf('stop') === 0) {
+            subzmq.unsubscribe('');
+          }
+
           zmq.send(sock.cmd);
           break;
         case 'DISCONNECT':
-          subzmq.unsubscribe();
+          subzmq.unsubscribe('');
 
-          zmq.disconnect();
-          subzmq.disconnect();
+          zmq.disconnect('tcp://localhost:5556');
+          subzmq.disconnect('tcp://localhost:5555');
           break;
         default:
           break;
       }
 
-      const onConnect = evt => {
-        console.log('zmqMiddleWare :: on connect :: ', evt);
+      const onConnect = () => {
         dispatch({
           type: 'CONNECTED'
         });

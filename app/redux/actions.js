@@ -4,18 +4,17 @@ export const DISCONNECTED = 'DISCONNECTED';
 export const CONNECT = 'CONNECT';
 export const COMMAND = 'COMMAND';
 
-export function connectToServer(ip) {
+export function connectToServer() {
   return {
     type: CONNECT,
-    sock: {
-      ip
-    }
+    sock: {}
   };
 }
 
 export function disconnectFromServer() {
   return {
-    type: 'DISCONNECT'
+    type: 'DISCONNECT',
+    sock: {}
   };
 }
 

@@ -14,9 +14,8 @@ class Layout extends React.Component {
     this.disconnect = this.disconnect.bind(this);
   }
 
-  connect(ip) {
-    console.log('Layout connect :: ', ip);
-    this.props.dispatch(connectToServer(ip));
+  connect() {
+    this.props.dispatch(connectToServer());
   }
 
   disconnect() {
@@ -40,17 +39,18 @@ class Layout extends React.Component {
   render() {
     return (
       <div>
-        <Navbar {...this.props} connect={this.connect} handleDisconnect={this.disconnect}/>
+        <Navbar {...this.props} handleConnect={this.connect} handleDisconnect={this.disconnect}/>
         <div className="container">
-          <div className="starter-template">
-            <h1>Bootstrap starter template</h1>
-            <p className="lead">
-              Use this document as a way to quickly start any new project.
-            </p>
+          <div className="row tools-wrapper">
+            <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
+            <div className="row">
+              <div className="col-md-12">Data Count : {this.props.cpuProfile.data.length} </div>
+            </div>
+            <div className="row">
+              <DisplayHandshake data={this.props.handshake}/>
+            </div>
           </div>
         </div>
-        <Toolbelt {...this.props} handshake={this.handshake} handleCpuSampling={this.cpuProfiling}/>
-        <DisplayHandshake data={this.props.handshake}/>
       </div>
     );
   }
@@ -63,8 +63,8 @@ Layout.propTypes = {
 };
 
 function mapStateToProps(state) {
-  console.log('mapStateToProps : ', state);
   return {
+    ip: state.connection.ip,
     status: state.connection.status,
     handshake: state.handshake,
     cpuProfile: state.cpuProfile
