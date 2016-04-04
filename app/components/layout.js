@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
 import Navbar from '../components/common/Navbar';
-import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
+import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling, updateCPUProfilingTable} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
 import DisplayCPUProfile from './displayCPUProfile';
 import Toolbelt from './toolbelt';
