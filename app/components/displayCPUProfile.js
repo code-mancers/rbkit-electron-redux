@@ -15,13 +15,21 @@ class DisplayCPUProfile extends Component {
   }
 
   handleSubRows(event) {
-    if (!this.updatedTable[clickedRowIndex]['isOpen']) {
-      this.createSubRows(event);
+    const clickedObjectId = event.currentTarget.dataset.objectId;
+    const clickedRowIndex = DataAnalyser.getIndexOfRowWithId(clickedObjectId);
+
+    this.updatedTable[clickedRowIndex]['isOpen']) ?
+      this.hideSubRows(clickedObjectId) : this.createSubRows(event);
     }
   }
 
   createSubRows(event) {
     this.updatedTable = DataAnalyser.createSubRows(event);
+    this.props.updateProfilingData(this.updatedTable);
+  }
+
+  hideSubRows(objectIndex) {
+    this.updatedTable = DataAnalyser.hideSubRows(objectIndex, true);
     this.props.updateProfilingData(this.updatedTable);
   }
 
