@@ -19,7 +19,7 @@ class DisplayCPUProfile extends Component {
     const clickedRowIndex = DataAnalyser.getIndexOfRowWithId(clickedObjectId);
 
     this.updatedTable[clickedRowIndex]['isOpen']) ?
-      this.hideSubRows(clickedObjectId) : this.createSubRows(event);
+      this.hideSubRows(clickedRowIndex) : this.createSubRows(event);
     }
   }
 
