@@ -120,6 +120,21 @@ const dataAnalyser = (() => {
     return cpuProfilingTable;
   }
 
+  const showSubRows = (objectIndex, toggleOpenState) => {
+    if (toggleOpenState) {
+      cpuProfilingTable[objectIndex]['isOpen']=true;
+    }
+    const childrenToShow = cpuProfilingTable[objectIndex]['children'];
+    childrenToShow.forEach(function(child) {
+      const rowIndex = getIndexOfRowWithId(child);
+      cpuProfilingTable[rowIndex]['isHidden']=false;
+      if (cpuProfilingTable[rowIndex]['isOpen'] && (cpuProfilingTable[rowIndex]['children'].length > -1)) {
+        showSubRows(rowIndex, false);
+      }
+    });
+    return cpuProfilingTable;
+  }
+
   const initializeTable = (dump) => {
     setup(dump);
     cpuProfilingTable = [];
@@ -140,6 +155,7 @@ const dataAnalyser = (() => {
 
   return {
     hideSubRows,
+    showSubRows,
     createSubRows,
     initializeTable,
     getIndexOfRowWithId
