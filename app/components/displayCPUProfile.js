@@ -7,8 +7,8 @@ class DisplayCPUProfile extends Component {
     return {paddingLeft: padding};
   }
 
-  getMethodNameFromBlock(blockName) {
-    return blockName.split('-')[blockName.split('-').length-1];
+  getBlockNameFromIdentifier(blockIdentifier) {
+    return blockIdentifier.split('-')[blockIdentifier.split('-').length-1];
   }
 
   displayCPUProfilingTable() {
@@ -21,12 +21,10 @@ class DisplayCPUProfile extends Component {
               if (!row['isHidden']) {
                 return (
                   <tr key={row['id']}>
+                    <td>{row['self'] + ' ms'}</td>
                     <td style={this.getStyle(row['nestedLevel'])}>
-                      {this.getMethodNameFromBlock(row['blockName'])}
-                    </td>
-                    <td style={{paddingLeft:"15px"}}>
                       <i className={row['isOpen'] ? 'fa fa-caret-down' : 'fa fa-caret-right'} />
-                      {' ' + row['self'] + ' ms'}
+                      {' ' + this.getBlockNameFromIdentifier(row['blockIdentifier'])}
                     </td>
                   </tr>
                 )
