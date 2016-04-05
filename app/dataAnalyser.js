@@ -83,6 +83,11 @@ const dataAnalyser = (() => {
     const callerBlockTime = cpuProfilingTable[clickedRowIndex]['self'];
     const callers = getCallersOfBlock(callerBlockName);
 
+    if (Object.keys(callers).length === 0) { 
+      cpuProfilingTable[clickedRowIndex]['isOpen'] = null;
+      return cpuProfilingTable;
+    }
+
     let insertNewRowAt = clickedRowIndex;
     let maxId = event.currentTarget.dataset.maxId;
     let numberOfCallers = 0;

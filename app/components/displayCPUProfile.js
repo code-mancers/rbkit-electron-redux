@@ -39,6 +39,24 @@ class DisplayCPUProfile extends Component {
     return {paddingLeft: padding};
   }
 
+  getCaret(row) {
+    let caret;
+    if (row['isOpen'] === true) {
+      caret = <i className='fa fa-caret-down'
+        data-object-id={row['id']}
+        data-max-id={this.updatedTable.length}
+        onClick={this.handleSubRows}
+      />
+    } else if (row['isOpen'] === false) {
+      caret = <i className='fa fa-caret-right'
+        data-object-id={row['id']}
+        data-max-id={this.updatedTable.length}
+        onClick={this.handleSubRows}
+      />
+    }
+    return caret;
+  }
+
   displayCPUProfilingTable() {
     return (
       <table className="table table-bordered table-condensed">
@@ -51,11 +69,7 @@ class DisplayCPUProfile extends Component {
                   <tr key={row['id']}>
                     <td>{row['self'] + ' ms'}</td>
                     <td style={this.getStyle(row['nestedLevel'])}>
-                      <i className={row['isOpen'] ? 'fa fa-caret-down' : 'fa fa-caret-right'}
-                        data-object-id={row['id']}
-                        data-max-id={this.updatedTable.length}
-                        onClick={this.handleSubRows}
-                      />
+                      { this.getCaret(row) }
                       {' ' + row['blockIdentifier'].split('-')[row['blockIdentifier'].split('-').length-1]}
                     </td>
                   </tr>
