@@ -1,8 +1,9 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
 import Navbar from '../components/common/Navbar';
-import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
+import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling, updateCPUProfilingTable} from '../redux/actions';
 import DisplayHandshake from './displayhandshake';
+import DisplayCPUProfile from './displayCPUProfile';
 import Toolbelt from './toolbelt';
 import Alert from './common/alert';
 
@@ -38,6 +39,18 @@ class Layout extends React.Component {
     this.props.dispatch(action);
   }
 
+  displayCPUProfilingTable() {
+    if (this.props.cpuProfile.data.length !== 0 && this.props.cpuProfile.status === 'STOPPED') {
+      return (
+        <DisplayCPUProfile 
+          data={this.props.cpuProfile}
+          updateProfilingData={this.updateProfilingData}
+          cpuProfilingTable={this.props.cpuProfilingTable}
+        />
+      )
+    }
+  }
+
   render() {
     let toolbelt = null;
     if (this.props.status === 'CONNECTED') {
@@ -60,6 +73,9 @@ class Layout extends React.Component {
             <div className="row">
               {this.props.handshake ? <DisplayHandshake data={this.props.handshake}/> : null}
             </div>
+            <div className="row">
+              { this.displayCPUProfilingTable() }
+            </div>
           </div>
         </div>
       </div>
@@ -72,7 +88,8 @@ Layout.propTypes = {
   message: PropTypes.string,
   status: PropTypes.string,
   cpuProfile: PropTypes.object,
-  handshake: PropTypes.object
+  handshake: PropTypes.object,
+  cpuProfilingTable: PropTypes.object
 };
 
 function mapStateToProps(state) {
@@ -81,7 +98,8 @@ function mapStateToProps(state) {
     status: state.connection.status,
     message: state.connection.message,
     handshake: state.handshake,
-    cpuProfile: state.cpuProfile
+    cpuProfile: state.cpuProfile,
+    cpuProfilingTable: state.cpuProfilingTable
   };
 }
 
