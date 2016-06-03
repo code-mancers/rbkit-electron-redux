@@ -13,17 +13,17 @@ const subscriber = ZMQ.socket('sub');
 requester.monitor(500, 0);
 subscriber.monitor(500, 0);
 
-const zmqMiddlewareCreator = (zmq, subzmq) => {
+const zmqMiddlewareCreator = (reqzmq, subzmq) => {
   return ({dispatch}) => {
     return next => action => {
-      if (!action.sock) {
+      if (!action.zmq) {
         return next(action);
       }
 
       console.log('zmqMiddleWare :: ', action);
 
-      const {type, sock, ...rest} = action;
-      console.log('zmqMiddleWare :: ', sock, type, rest);
+      const {type, zmq, ...rest} = action;
+      console.log('zmqMiddleWare :: ', zmq, type, rest);
 
       if (type) {
         next({type, ...rest});
@@ -33,7 +33,7 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
 
       switch (type) {
         case 'CONNECT':
-          zmq.connect('tcp://localhost:5556');
+          reqzmq.connect('tcp://localhost:5556');
           subzmq.connect('tcp://localhost:5555');
 
           dispatch({
@@ -49,19 +49,19 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
 
           break;
         case 'COMMAND':
-          if (sock.cmd && sock.cmd.indexOf('start') === 0) {
+          if (zmq.cmd && zmq.cmd.indexOf('start') === 0) {
             subzmq.subscribe('');
           }
-          if (sock.cmd && sock.cmd.indexOf('stop') === 0) {
+          if (zmq.cmd && zmq.cmd.indexOf('stop') === 0) {
             subzmq.unsubscribe('');
           }
 
-          zmq.send(sock.cmd);
+          reqzmq.send(zmq.cmd);
           break;
         case 'DISCONNECT':
           subzmq.unsubscribe('');
 
-          zmq.disconnect('tcp://localhost:5556');
+          reqzmq.disconnect('tcp://localhost:5556');
           subzmq.disconnect('tcp://localhost:5555');
           break;
         default:
@@ -80,13 +80,13 @@ const zmqMiddlewareCreator = (zmq, subzmq) => {
         });
       };
 
-      zmq.on('connect', onConnect);
+      reqzmq.on('connect', onConnect);
       subzmq.on('connect', onConnect);
 
-      zmq.on('disconnect', onDisconnect);
+      reqzmq.on('disconnect', onDisconnect);
       subzmq.on('disconnect', onDisconnect);
 
-      zmq.on('message', reply => {
+      reqzmq.on('message', reply => {
         const data = MsgPack.unpack(reply);
         console.log('Received reply in middleware : ', data);
         clearTimeout(connectTimer);

@@ -7,21 +7,21 @@ export const COMMAND = 'COMMAND';
 export function connectToServer() {
   return {
     type: CONNECT,
-    sock: {}
+    zmq: {}
   };
 }
 
 export function disconnectFromServer() {
   return {
     type: 'DISCONNECT',
-    sock: {}
+    zmq: {}
   };
 }
 
 export function handshake() {
   return {
     type: COMMAND,
-    sock: {
+    zmq: {
       cmd: 'handshake'
     }
   };
@@ -30,7 +30,7 @@ export function handshake() {
 export function startCpuProfiling() {
   return {
     type: COMMAND,
-    sock: {
+    zmq: {
       cmd: 'start_cpu_profiling'
     }
   };
@@ -39,7 +39,7 @@ export function startCpuProfiling() {
 export function stopCpuProfiling() {
   return {
     type: COMMAND,
-    sock: {
+    zmq: {
       cmd: 'stop_cpu_profiling'
     }
   };
