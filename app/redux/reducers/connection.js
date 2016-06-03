@@ -27,7 +27,10 @@ const connection = function (state = initialState, action) {
 const handshake = function (state = {}, action) {
   switch (action.type) {
     case 'DATA':
-      return action.data;
+      if (action.from === 'requester') {
+        return action.data;
+      }
+      return null;
     default:
       return state;
   }
