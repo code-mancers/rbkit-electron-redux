@@ -6,14 +6,11 @@ will replace the official Qt client.
 
 ## Development
 
-First setup Rbkit server and run the example script with the profiler turned on.
 ```
-$ git clone https://github.com/code-mancers/rbkit.git
-$ cd rbkit
-$ rake compile
-$ ruby experiments/using_rbkit.rb
+cp config/config.js.example config/config.js
 ```
-The profiler is now running and can send and receive data and commands.
+
+Now start this app by running `npm install && npm start`. Run `cmd + opt + I` to open the dev tools. Refresh the app to see data in the console that is being recevied from Rbkit.
 
 Now setup the Rbkit client:
 ```
