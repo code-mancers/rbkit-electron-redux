@@ -59,8 +59,19 @@ const cpuProfile = (state = {status: 'STOPPED', data: []}, action) => {
   }
 };
 
+const cpuProfilingTable = (state = {cpuProfilingTable: []}, action) => {
+  switch (action.type) {
+    case 'UPDATE_CPU_PROFILING_TABLE':
+      return Object.assign({}, state, { cpuProfilingTable: action.data});
+    
+    default:
+      return state;
+  }
+}
+
 export {
   connection,
   cpuProfile,
-  handshake
+  handshake,
+  cpuProfilingTable
 };
