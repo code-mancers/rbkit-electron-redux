@@ -9,11 +9,15 @@ const connection = function (state = initialState, action) {
   switch (action.type) {
     case CONNECT_TO_SERVER:
       return Object.assign({}, state, {status: ''});
+    case 'CONNECTING':
+      return Object.assign({}, state, {status: 'CONNECTING'});
     case CONNECTED:
       return Object.assign({}, state, {status: 'CONNECTED', ip: action.ip});
     case DISCONNECTED:
     case 'DISCONNECT':
-      return Object.assign({}, state, {status: 'DISCONNECTED', ip: ''});
+      return Object.assign({}, state, {status: 'DISCONNECTED'});
+    case 'ERROR':
+      return Object.assign({}, state, {status: 'FAILED', message: action.message});
 
     default:
       return state;
