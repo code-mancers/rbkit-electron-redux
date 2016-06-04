@@ -1,101 +1,94 @@
 {
-  "name": "electron-quick-start",
-  "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "name": "rbkit-client",
+  "productName": "RbkitClient",
+  "version": "0.0.1",
+  "description": "GUI client for Rbkit",
   "main": "main.js",
   "scripts": {
-    "start": "NODE_ENV=development electron main.js",
-    "lint": "xo"
+    "test": "cross-env NODE_ENV=test mocha --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
+    "test-watch": "npm test -- --watch",
+    "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js --require co-mocha ./test/e2e.js",
+    "lint": "eslint app test *.js",
+    "hot-server": "node -r babel-register server.js",
+    "build-main": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.electron.js --progress --profile --colors",
+    "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
+    "build": "npm run build-main && npm run build-renderer",
+    "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register ./main.development",
+    "package": "cross-env NODE_ENV=production node -r babel-register package.js",
+    "package-all": "npm run package -- --all",
+    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
+    "start": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/atom/electron-quick-start.git"
+  "bin": {
+    "electron": "./node_modules/.bin/electron"
   },
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial"
-  ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
-  "bugs": {
-    "url": "https://github.com/atom/electron-quick-start/issues"
-  },
-  "homepage": "https://github.com/atom/electron-quick-start#readme",
+  "license": "MIT",
   "devDependencies": {
-    "babel-eslint": "6.0.0-beta.5",
+    "asar": "^0.11.0",
+    "babel-core": "^6.9.0",
+    "babel-eslint": "^6.0.4",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-webpack-loaders": "^0.5.0",
+    "babel-polyfill": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-react-hmre": "^1.1.1",
     "babel-preset-stage-0": "^6.5.0",
-    "electron-debug": "^0.5.2",
-    "electron-prebuilt": "^0.36.0",
-    "eslint": "^2.2.0",
-    "eslint-config-xo-react": "^0.5.0",
-    "eslint-config-xo-space": "^0.11.0",
-    "eslint-plugin-react": "^4.2.1",
-    "react-hot-loader": "^1.3.0",
-    "xo": "^0.12.0"
-  },
-  "dependencies": {
-    "babel-preset-es2015": "6.5.0",
-    "babel-preset-react": "6.5.0",
-    "babel-register": "6.5.2",
-    "react": "0.14.7",
-    "react-dom": "0.14.7",
-    "react-redux": "^4.4.0",
-    "redux": "^3.3.1",
+    "babel-register": "^6.9.0",
+    "bootstrap": "3.3.6",
+    "chai": "^3.5.0",
+    "chromedriver": "^2.21.2",
+    "co-mocha": "^1.1.2",
+    "concurrently": "^2.1.0",
+    "cross-env": "^1.0.8",
+    "css-loader": "^0.23.1",
+    "css-modules-require-hook": "^4.0.0",
+    "del": "^2.2.0",
+    "electron-debug": "^1.0.0",
+    "electron-packager": "^7.0.2",
+    "electron-prebuilt": "^1.2.0",
+    "electron-rebuild": "^1.1.4",
+    "eslint": "^2.10.2",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-import-resolver-webpack": "^0.3.0",
+    "eslint-plugin-import": "^1.8.1",
+    "eslint-plugin-jsx-a11y": "^1.2.2",
+    "eslint-plugin-react": "^5.1.1",
+    "express": "^4.13.4",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "fbjs-scripts": "^0.7.1",
+    "font-awesome": "^4.6.3",
+    "jsdom": "^9.2.0",
+    "json-loader": "^0.5.4",
+    "minimist": "^1.2.0",
+    "mocha": "^2.5.3",
+    "msgpack": "1.0.2",
+    "node-libs-browser": "^1.0.0",
+    "postcss": "^5.0.21",
+    "react": "^15.1.0",
+    "react-addons-test-utils": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.4.1",
+    "react-router-redux": "^4.0.4",
+    "redux": "^3.5.2",
+    "redux-devtools": "^3.3.1",
+    "redux-devtools-dock-monitor": "^1.1.1",
+    "redux-devtools-log-monitor": "^1.0.11",
     "redux-logger": "^2.6.1",
-    "redux-thunk": "^2.0.1",
-    "thunk": "0.0.1",
-    "zmq": "2.14.0",
-    "msgpack": "1.0.2"
+    "redux-thunk": "^2.1.0",
+    "selenium-webdriver": "^2.53.2",
+    "sinon": "^1.17.4",
+    "source-map-support": "^0.4.0",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.1",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.10.0",
+    "zmq": "2.15.3"
   },
-  "eslintConfig": {
-    "extends": [
-      "xo-space",
-      "xo-react"
-    ],
-    "ecmaFeatures": {
-      "jsx": true,
-      "experimentalObjectRestSpread": true,
-      "modules": true
-    }
-  },
-  "xo": {
-    "space": 2,
-    "rules": {
-      "camelcase": [
-        2,
-        {
-          "properties": "never"
-        }
-      ],
-      "react/jsx-indent-props": [2, 2],
-      "react/jsx-indent": [2, 2]
-    },
-    "globals": [
-      "window",
-      "document",
-      "jest",
-      "describe",
-      "it",
-      "expect",
-      "beforeEach",
-      "afterEach",
-      "xit"
-    ],
-    "envs": {
-      "node": true,
-      "browser": true,
-      "jquery": true,
-      "es6": true,
-      "jasmine": true
-    },
-    "esnext": true,
-    "extends": [
-      "xo-react"
-    ],
-    "ignores": [
-      "vendor/**"
-    ]
+  "devEngines": {
+    "node": "4.x || 5.x || 6.x",
+    "npm": "2.x || 3.x"
   }
 }
