@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import RbkitConnection from '../rbkitConnection';
+import RbkitConnection from '../rbkit_connection';
 
 export const Rbkit = ComposedComponent => class extends Component {
   constructor(props) {
