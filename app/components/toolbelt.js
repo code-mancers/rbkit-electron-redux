@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import Button from './common/Button';
+import Button from './common/button';
 
 class Toolbelt extends Component {
   render() {

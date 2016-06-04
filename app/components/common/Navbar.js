@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import ConnectionForm from '../connectionForm';
+import ConnectionForm from '../connection_form';
 
 export default class Navbar extends Component {
   render() {
