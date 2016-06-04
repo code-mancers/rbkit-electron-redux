@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 import ZMQ from 'zmq';
 
 import * as reducers from './reducers/connection';
-import rbkit from './rbkitMiddleware';
+import rbkit from './rbkit_middleware';
 
 let connectTimer;
 

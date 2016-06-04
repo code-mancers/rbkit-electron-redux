@@ -1,8 +1,8 @@
 import React, {PropTypes} from 'react';
 import {connect} from 'react-redux';
-import Navbar from '../components/common/Navbar';
+import Navbar from '../components/common/navbar';
 import {connectToServer, disconnectFromServer, handshake, startCpuProfiling, stopCpuProfiling} from '../redux/actions';
-import DisplayHandshake from './displayhandshake';
+import DisplayHandshake from './display_handshake';
 import Toolbelt from './toolbelt';
 import Alert from './common/alert';
 
